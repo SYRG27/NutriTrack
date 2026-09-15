@@ -760,7 +760,85 @@ export const FOODS: Food[] = [
  F("Overnight oats","🥣","cup",350,12,0,"american breakfast"),
  F("Chia pudding","🥣","cup",250,8,0,"breakfast"),
  F("Smoothie bowl","🥣","bowl",450,10,0,"breakfast"),
- F("Egg and cheese bagel","🥯","sandwich",500,22,0,"breakfast deli")
+ F("Egg and cheese bagel","🥯","sandwich",500,22,0,"breakfast deli"),
+
+ /* ===================================================================
+    Indian restaurant portions — bigger and richer than the same dish
+    cooked at home, so they get their own rows.
+    =================================================================== */
+
+ /* --- tandoor, by the platter --- */
+ F("Tandoori mixed grill platter","🍢","platter",950,75,0,"restaurant tandoori assorted"),
+ F("Tandoori chicken, half","🍗","half",520,60,0,"restaurant tandoor"),
+ F("Tandoori chicken, full","🍗","full",1040,120,0,"restaurant tandoor"),
+ F("Chicken tikka platter","🍢","platter",620,58,0,"restaurant tandoor starter"),
+ F("Malai tikka","🍢","serving",560,45,0,"restaurant tandoor creamy"),
+ F("Hariyali tikka","🍢","serving",480,46,0,"restaurant tandoor green"),
+ F("Tangdi kabab, 2","🍗","serving",520,48,0,"restaurant tandoor drumstick"),
+ F("Mutton boti kabab","🍢","serving",560,45,0,"restaurant tandoor"),
+ F("Fish tikka platter","🐟","platter",520,52,0,"restaurant tandoor"),
+ F("Paneer tikka platter","🧀","platter",640,32,0,"restaurant tandoor veg"),
+ F("Tandoori prawns","🦐","serving",420,45,0,"restaurant tandoor"),
+ F("Veg seekh kabab, 2","🍢","serving",320,10,0,"restaurant tandoor"),
+ F("Hara bhara kabab, 4","🍢","serving",340,10,0,"restaurant starter veg"),
+
+ /* --- combos, the way they arrive at the table --- */
+ F("Butter chicken with 2 butter naan","🍛","combo",1300,55,0,"restaurant combo"),
+ F("Butter chicken with rice","🍛","combo",1050,50,0,"restaurant combo"),
+ F("Paneer butter masala with 2 naan","🍛","combo",1200,35,0,"restaurant combo"),
+ F("Dal makhani with 2 butter naan","🍛","combo",1100,30,0,"restaurant combo"),
+ F("Chicken curry with 2 roti","🍛","combo",900,50,0,"restaurant combo"),
+ F("Chicken biryani with raita","🍛","combo",850,40,0,"restaurant combo"),
+ F("Veg thali","🍽️","thali",900,25,0,"restaurant meals plate unlimited"),
+ F("Non-veg thali","🍽️","thali",1150,55,0,"restaurant meals plate"),
+ F("South Indian meals plate","🍽️","plate",850,22,0,"restaurant banana leaf unlimited"),
+ F("Lunch buffet plate","🍽️","plate",1100,40,0,"restaurant indian"),
+ F("Roti basket, 4 breads","🫓","basket",620,18,0,"restaurant assorted"),
+
+ /* --- restaurant curries --- */
+ F("Chicken chettinad","🍛","cup",380,30,0,"restaurant south indian"),
+ F("Andhra chicken curry","🍛","cup",400,30,0,"restaurant spicy"),
+ F("Methi malai murgh","🍛","cup",420,28,0,"restaurant creamy"),
+ F("Chicken saagwala","🥬","cup",340,28,0,"restaurant palak chicken"),
+ F("Lamb vindaloo","🍛","cup",450,30,0,"restaurant goan"),
+ F("Lamb korma","🍛","cup",480,28,0,"restaurant creamy"),
+ F("Goan fish curry","🐟","cup",330,26,0,"restaurant coconut"),
+ F("Prawn masala","🦐","cup",340,28,0,"restaurant"),
+ F("Egg masala curry","🍛","cup",330,18,0,"restaurant anda"),
+ F("Paneer lababdar","🧀","cup",400,17,0,"restaurant creamy"),
+ F("Navratan korma","🥘","cup",420,12,0,"restaurant creamy veg"),
+ F("Veg kolhapuri","🥘","cup",330,9,0,"restaurant spicy"),
+ F("Bhindi do pyaza","🥬","serving",260,4,0,"restaurant okra"),
+ F("Dal bukhara","🫘","cup",330,12,0,"restaurant black dal"),
+ F("Dal palak","🥬","katori",200,10,0,"restaurant spinach dal"),
+
+ /* --- starters and Indo-Chinese --- */
+ F("Chilli chicken","🌶️","serving",550,35,0,"indo chinese starter"),
+ F("Chilli paneer","🌶️","serving",520,22,0,"indo chinese starter"),
+ F("Gobi manchurian","🥬","serving",480,9,0,"indo chinese starter"),
+ F("Veg manchurian gravy","🥘","serving",420,10,0,"indo chinese"),
+ F("Chicken lollipop, 4","🍗","serving",520,32,0,"indo chinese starter"),
+ F("Paneer 65","🧀","serving",480,24,0,"starter"),
+ F("Schezwan fried rice","🍚","plate",680,14,0,"indo chinese"),
+ F("Hakka noodles","🍜","plate",620,14,0,"indo chinese"),
+ F("Chicken manchurian","🍗","serving",560,32,0,"indo chinese"),
+
+ /* --- breads and rice, restaurant size --- */
+ F("Cheese naan","🫓","naan",380,12,0,"restaurant"),
+ F("Rumali roti","🫓","roti",120,4,0,"restaurant"),
+ F("Amritsari kulcha","🫓","kulcha",340,8,0,"restaurant"),
+ F("Kashmiri pulao","🍚","plate",480,9,0,"restaurant sweet"),
+ F("Hyderabadi dum biryani, chicken","🍛","plate",780,38,0,"restaurant"),
+ F("Hyderabadi dum biryani, mutton","🍛","plate",880,40,0,"restaurant"),
+
+ /* --- sides, sweets and drinks --- */
+ F("Masala papad","🫓","papad",120,3,0,"restaurant starter"),
+ F("Mixed raita","🥛","bowl",160,6,0,"restaurant"),
+ F("Green salad, Indian","🥗","serving",80,3,0,"restaurant onion lemon"),
+ F("Mango lassi","🥭","glass",300,8,0,"restaurant drink"),
+ F("Falooda","🍨","glass",420,8,0,"restaurant dessert"),
+ F("Jaljeera","🥤","glass",40,0,0,"restaurant drink"),
+ F("Gulab jamun with ice cream","🍮","serving",420,5,0,"restaurant dessert")
 
 
 
