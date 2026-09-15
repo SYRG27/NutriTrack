@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "login" | "signup";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,15 +56,22 @@ export default function LoginPage() {
         setBusy(false);
         return;
       }
+      // With email confirmation off, signUp returns a session straight away.
+      // If the project still requires confirmation, signing in fails loudly
+      // rather than leaving the button spinning.
       if (!data.session) {
-        setNotice("Account created. Check your email to confirm it, then log in.");
-        setBusy(false);
-        return;
+        const retry = await supabase.auth.signInWithPassword({ email, password });
+        if (retry.error) {
+          setNotice("Account created, but it needs confirming before you can log in.");
+          setBusy(false);
+          return;
+        }
       }
     }
 
-    router.push("/");
-    router.refresh();
+    // A full load, not a client-side push — guarantees the new auth cookie
+    // is sent with the request that renders the app.
+    window.location.replace("/");
   }
 
   const signup = mode === "signup";
