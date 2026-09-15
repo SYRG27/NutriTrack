@@ -17,6 +17,18 @@ import WeekPlan from "./WeekPlan";
 import Trends from "./Trends";
 
 type Tab = "today" | "week" | "trends";
+
+type MyFoodRow = {
+  name: string; emoji: string; unit: string;
+  per_g: boolean; unit_kcal: number; unit_protein: number;
+};
+
+/** A saved row, as a Food the search and the picker can use. */
+const toMyFood = (r: MyFoodRow): [string, Food] => [
+  r.name,
+  { n: r.name, e: r.emoji, u: r.unit, g: r.per_g,
+    k: Number(r.unit_kcal), p: Number(r.unit_protein), a: "my version saved" },
+];
 const TODAY = () => dayKey(new Date());
 const HISTORY_DAYS = 35;
 
@@ -52,6 +64,9 @@ export default function NutriTrack({
   // The catalogue's numbers are a starting point; a bar on your counter may differ.
   const [pickK, setPickK] = useState(0);
   const [pickP, setPickP] = useState(0);
+  const [remember, setRemember] = useState(false);
+  // Foods you saved your own numbers for, keyed by name.
+  const [myFoods, setMyFoods] = useState<Record<string, Food>>({});
 
   const say = useCallback((m: string) => {
     setToast(m);
@@ -63,13 +78,15 @@ export default function NutriTrack({
     let alive = true;
     (async () => {
       const since = shiftKey(TODAY(), -HISTORY_DAYS);
-      const [e, w] = await Promise.all([
+      const [e, w, f] = await Promise.all([
         supabase.from("entries").select("*").gte("eaten_on", since).order("eaten_at"),
         supabase.from("weigh_ins").select("measured_on, lb").order("measured_on"),
+        supabase.from("user_foods").select("*"),
       ]);
       if (!alive) return;
       if (e.data) setEntries(e.data as Entry[]);
       if (w.data) setWeighIns(w.data as WeighIn[]);
+      if (f.data) setMyFoods(Object.fromEntries((f.data as MyFoodRow[]).map(toMyFood)));
       setLoading(false);
     })();
     return () => { alive = false; };
@@ -208,6 +225,35 @@ export default function NutriTrack({
     [supabase, say],
   );
 
+  const rememberFood = useCallback(
+    async (f: Food, k: number, p: number) => {
+      const row = {
+        name: f.n, emoji: f.e, unit: f.u, per_g: f.g,
+        unit_kcal: k, unit_protein: p, updated_at: new Date().toISOString(),
+      };
+      const { data: u } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from("user_foods").upsert({ ...row, user_id: u.user?.id });
+      if (error) return say("Could not save your version");
+      setMyFoods((prev) => ({ ...prev, [f.n]: { ...f, k, p, a: "my version saved" } }));
+      say(`Saved your ${f.n}`);
+    },
+    [supabase, say],
+  );
+
+  const forgetFood = useCallback(
+    async (name: string) => {
+      await supabase.from("user_foods").delete().eq("name", name);
+      setMyFoods((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+      say("Back to the catalogue numbers");
+    },
+    [supabase, say],
+  );
+
   async function estimate() {
     const food = q.trim();
     if (!food || thinking) return;
@@ -230,7 +276,7 @@ export default function NutriTrack({
         a: "",
       };
       setPick(f); setQty(defaultQty(f)); setWhen(nowHM());
-      setPickK(f.k); setPickP(f.p);
+      setPickK(f.k); setPickP(f.p); setRemember(false);
       say("Estimated — adjust the amount, then save");
     } catch (err) {
       say(err instanceof Error ? err.message : "Could not estimate");
@@ -334,6 +380,14 @@ export default function NutriTrack({
                        onChange={(ev) => setDraft(e, { p: Math.max(0, +ev.target.value) })} />
               </div>
             </div>
+            <button type="button" className="forget" style={{ color: "var(--leaf)" }}
+              onClick={() => rememberFood(
+                { n: e.name, e: e.emoji ?? "🍽️", u: e.unit ?? "serving", g: e.per_g,
+                  k: d.k, p: d.p, a: "" },
+                d.k, d.p,
+              )}>
+              Remember my version of {e.name}
+            </button>
           </details>
         )}
       </div>
@@ -400,7 +454,8 @@ export default function NutriTrack({
 
   blocks.sort((a, b) => (a.t === b.t ? a.o - b.o : a.t.localeCompare(b.t)));
 
-  const matches = findFoods(q);
+  const mine = useMemo(() => Object.values(myFoods), [myFoods]);
+  const matches = findFoods(q, mine);
   const sorted = [...dayEntries].sort((a, b) => a.eaten_at.localeCompare(b.eaten_at));
   const kcalLeft = Math.round(TARGET.kcal - totals.kcal);
   const protLeft = Math.round(TARGET.protein - totals.protein);
@@ -510,12 +565,17 @@ export default function NutriTrack({
                     {matches.map((f) => (
                       <button key={f.n} className="fres"
                               onClick={() => {
+                                const saved = myFoods[f.n];
                                 setPick(f); setQty(defaultQty(f)); setWhen(nowHM());
-                                setPickK(f.k); setPickP(f.p);
+                                setPickK(saved?.k ?? f.k); setPickP(saved?.p ?? f.p);
+                                setRemember(false);
                               }}>
                         <span className="fe">{f.e}</span>
-                        <span className="fn">{f.n}</span>
-                        <span className="fu">{perUnit(f)}</span>
+                        <span className="fn">
+                          {f.n}
+                          {myFoods[f.n] && <span className="mine">yours</span>}
+                        </span>
+                        <span className="fu">{perUnit(myFoods[f.n] ?? f)}</span>
                       </button>
                     ))}
                   </div>
@@ -607,9 +667,19 @@ export default function NutriTrack({
                                  value={pickP} onChange={(e) => setPickP(Math.max(0, +e.target.value))} />
                         </div>
                       </div>
-                      <p className="grpsub" style={{ margin: "8px 0 0" }}>
-                        Read them off the packet. This changes today&rsquo;s entry only.
-                      </p>
+                      <label className="remember">
+                        <input type="checkbox" checked={remember}
+                               onChange={(e) => setRemember(e.target.checked)} />
+                        <span>
+                          Remember my version of {pick.n} — use these numbers every time
+                        </span>
+                      </label>
+                      {myFoods[pick.n] && (
+                        <button type="button" className="forget"
+                                onClick={() => forgetFood(pick.n)}>
+                          Forget my version, go back to the catalogue
+                        </button>
+                      )}
                     </details>
                     <div className="qtime">
                       <label htmlFor="qwhen">What time?</label>
@@ -620,8 +690,10 @@ export default function NutriTrack({
                       onClick={() => {
                         const f = pick, amount = qty, at = when || nowHM();
                         const nums = { k: pickK, p: pickP };
-                        setPick(null); setQ(""); setWhen("");
+                        const keep = remember;
+                        setPick(null); setQ(""); setWhen(""); setRemember(false);
                         addFood(f, amount, at, nums);
+                        if (keep) rememberFood(f, nums.k, nums.p);
                         say(`${f.n} saved at ${h12(at)}`);
                       }}
                     >Save to my day</button>
@@ -638,7 +710,12 @@ export default function NutriTrack({
                   if (!f) return null;
                   return (
                     <button key={n} className="chip"
-                            onClick={() => { addFood(f, defaultQty(f), nowHM()); say(`Added ${f.n}`); }}>
+                            onClick={() => {
+                              const saved = myFoods[f.n];
+                              addFood(f, defaultQty(f), nowHM(),
+                                saved ? { k: saved.k, p: saved.p } : undefined);
+                              say(`Added ${f.n}`);
+                            }}>
                       {f.e} {f.n.replace(/ \(.*\)/, "")}
                     </button>
                   );

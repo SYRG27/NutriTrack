@@ -662,14 +662,20 @@ export function plural(u: string, q: number) {
   return u + "s";
 }
 
-export function findFoods(q: string): Food[] {
+/** `mine` are the foods you saved your own numbers for; they rank first. */
+export function findFoods(q: string, mine: Food[] = []): Food[] {
   const t = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
   if (!t.length) return [];
+  const seen = new Set(mine.map((f) => f.n));
   const out: { f: Food; r: number }[] = [];
-  FOODS.forEach((f) => {
+
+  const consider = (f: Food, bonus: number) => {
     const hay = (f.n + " " + f.a).toLowerCase();
     if (t.every((x) => hay.includes(x)))
-      out.push({ f, r: (f.n.toLowerCase().startsWith(t[0]) ? 0 : 100) + f.n.length });
-  });
+      out.push({ f, r: bonus + (f.n.toLowerCase().startsWith(t[0]) ? 0 : 100) + f.n.length });
+  };
+
+  mine.forEach((f) => consider(f, -1000));
+  FOODS.forEach((f) => { if (!seen.has(f.n)) consider(f, 0); });
   return out.sort((a, b) => a.r - b.r).slice(0, 8).map((x) => x.f);
 }
