@@ -370,11 +370,36 @@ export const FOODS: Food[] = [
  F("Kulfi","🍨","piece",200,4,0),
  F("Salted lassi","🥛","glass",110,6,0,"namkeen chaas"),
  F("Masala chai","☕","cup",100,2,0),
- F("Thandai","🥛","glass",230,7,0)
+ F("Thandai","🥛","glass",230,7,0),
+
+ /* ===== Dry fruit, nut and seed packs — the healthy evening snack =====
+    Pack rows are the ~30 g single-serve size (Sam's Club / Costco style).
+    Loose nuts stay per 100 g so you can weigh a bigger handful. */
+ F("Trail mix pack","🥜","pack",140,4,0,"dry fruit nuts seeds raisins sams costco"),
+ F("Mixed dry fruits pack","🥜","pack",150,4,0,"dryfruit nuts sams costco"),
+ F("Mixed nuts and seeds","🥜","g",570,18,1,"dry fruit"),
+ F("Almond pack","🌰","pack",170,6,0,"badam 30g dry fruit"),
+ F("Cashew pack","🥜","pack",165,5,0,"jeedipappu dry fruit"),
+ F("Walnut pack","🌰","pack",195,5,0,"akhrot dry fruit"),
+ F("Pistachios","🥜","g",560,20,1,"pista dry fruit"),
+ F("Raisins","🍇","g",299,3,1,"kishmish dry fruit"),
+ F("Dried figs","🟤","fig",30,0.4,0,"anjeer dry fruit"),
+ F("Dried apricots","🍑","piece",17,0.2,0,"khubani dry fruit"),
+ F("Prunes","🟣","piece",23,0.2,0,"dried plum dry fruit"),
+ F("Dried cranberries","🔴","g",308,0.1,1,"dry fruit"),
+ F("Pumpkin seeds","🎃","g",559,30,1,"seeds"),
+ F("Sunflower seeds","🌻","g",584,21,1,"seeds"),
+ F("Chia seeds","⚫","tbsp",60,2,0,"seeds"),
+ F("Flax seeds","🟤","tbsp",55,2,0,"avise ginjalu seeds"),
+ F("Makhana","🍿","cup",100,3,0,"roasted fox nuts phool"),
+ F("Peanut butter","🥜","tbsp",95,4,0),
+ F("Granola bar","🍫","bar",190,4,0,"cereal bar"),
+ F("Protein bar","🍫","bar",220,20,0)
+
 
 
 ];
-export const FAVES: string[] = ["Banana","Boiled egg","Black coffee","Tea with sugar","Curd","White rice (cooked)","Phulka","Whey shake","Buttermilk","Chicken curry"];
+export const FAVES: string[] = ["Banana","Boiled egg","Black coffee","Tea with sugar","Curd","White rice (cooked)","Phulka","Whey shake","Trail mix pack","Chicken curry"];
 
 export const foodByName = (n: string) => FOODS.find((f) => f.n === n);
 export const perUnit = (f: Food) => (f.g ? `${f.k} kcal / 100 g` : `${f.k} kcal per ${f.u}`);
