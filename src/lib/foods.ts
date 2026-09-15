@@ -394,7 +394,10 @@ export const FOODS: Food[] = [
  F("Makhana","🍿","cup",100,3,0,"roasted fox nuts phool"),
  F("Peanut butter","🥜","tbsp",95,4,0),
  F("Granola bar","🍫","bar",190,4,0,"cereal bar"),
- F("Protein bar","🍫","bar",220,20,0)
+ F("Protein bar","🍫","bar",220,20,0),
+ F("Rice, raw (uncooked)","🍚","g",360,7,1,"biyyam before cooking dry"),
+ F("Rice, 1 measuring cup raw","🍚","cup",650,12,0,"200ml glass biyyam uncooked dry"),
+ F("Rice, raw (basmati)","🍚","g",350,8,1,"uncooked dry")
 
 
 

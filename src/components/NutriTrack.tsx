@@ -217,7 +217,14 @@ export default function NutriTrack({
 
   /* ---------- today ---------- */
   const plan = PLAN[parseKey(key).getDay()];
-  const own = dayEntries.filter((e) => !e.plan_id);
+
+  /* Renaming a meal in plan.ts orphans anything already ticked against the old
+     name. Show those as your own entries rather than letting them count toward
+     the rings while being invisible. */
+  const planIds = new Set(
+    plan.slots.flatMap((s) => s.items.map((i) => planIdOf(s.id, i.n))),
+  );
+  const own = dayEntries.filter((e) => !e.plan_id || !planIds.has(e.plan_id));
 
   /* Anything you logged yourself joins the meal whose time it sits closest to,
      so a banana at 12:39 lands in Lunch rather than floating between meals. */
