@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type Mode = "login" | "signup";
@@ -13,6 +13,18 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+
+  // The server bounces you back here with a reason; say what it was.
+  useEffect(() => {
+    const reason = new URLSearchParams(window.location.search).get("error");
+    if (reason === "not_allowed")
+      setError(
+        "Signed in, but this email is not on the ALLOWED_EMAILS list for the site. " +
+          "Remove that environment variable in Vercel, or add this address to it.",
+      );
+    else if (reason === "link_expired")
+      setError("That sign-in link had already been used. Log in with your password instead.");
+  }, []);
 
   function switchTo(next: Mode) {
     setMode(next);
