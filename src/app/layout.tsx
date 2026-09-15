@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "NutriTrack",
-  description: "Your meal plan, your food log, and the road to 165 lb.",
+  description: "Tell it your numbers, get a week of meals built around them, and log what you actually eat.",
   appleWebApp: { capable: true, title: "NutriTrack", statusBarStyle: "default" },
 };
 

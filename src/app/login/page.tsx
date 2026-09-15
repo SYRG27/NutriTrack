@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Logo from "@/components/Logo";
 
 type Mode = "login" | "signup";
 
@@ -91,10 +92,10 @@ export default function LoginPage() {
   return (
     <div className="auth">
       <div className="authcard">
-        <h1>
-          Nutri<span>Track</span>
-        </h1>
-        <p>Your meal plan, your food log, and the road to 165 lb.</p>
+        <div className="setuphead" style={{ marginBottom: 6 }}>
+          <Logo size={32} />
+        </div>
+        <p>Tell it your numbers, get a week of meals built around them, and log what you actually eat.</p>
 
         <div className="authtabs" role="tablist">
           <button

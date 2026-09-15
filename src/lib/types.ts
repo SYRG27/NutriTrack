@@ -1,4 +1,18 @@
-export type PlanItem = { n: string; k: number; p: number; e: string };
+/** A planned item. `k` and `p` are per ONE unit, so portions can be scaled
+ *  to whatever calorie target the person's profile works out to. */
+export type PlanItem = {
+  n: string;            // dish name, without the amount
+  q: number;            // how many units
+  u: string;            // idli, cup, katori, g, serving...
+  k: number;            // kcal per unit
+  p: number;            // protein grams per unit
+  e: string;            // emoji
+  tag: FoodTag;         // what it is made of, for the diet swaps
+  fixed?: boolean;      // true = never scale this portion (coffee, buttermilk)
+  alt?: boolean;        // true = an alternative to the item above, not an addition
+};
+
+export type FoodTag = "meat" | "fish" | "egg" | "dairy" | "veg";
 export type PlanSlot = {
   id: string;
   time: string;
@@ -43,4 +57,5 @@ export type Entry = {
 
 export type WeighIn = { measured_on: string; lb: number };
 
+/** Fallback only — a signed-in person's real targets come from their profile. */
 export const TARGET = { kcal: 2350, protein: 175, startLb: 180, goalLb: 165 };

@@ -1,26 +1,37 @@
-import { PLAN, planTotals } from "@/lib/plan";
+import { itemLabel, planTotals, proteinShortfall } from "@/lib/plan";
+import { targetsFor, showWeight, type Profile } from "@/lib/profile";
 import { h12 } from "@/lib/day";
+import type { PlanDay } from "@/lib/types";
 
 const ORDER = [1, 2, 3, 4, 5, 6, 0];
 
-export default function WeekPlan() {
+export default function WeekPlan({
+  plan, profile,
+}: { plan: Record<number, PlanDay>; profile: Profile }) {
+  const t = targetsFor(profile);
+  const prot = proteinShortfall(plan, t);
+  const goalLine =
+    profile.goal === "maintain"
+      ? `holding at ${showWeight(profile.weight_lb, profile.units)}`
+      : `${showWeight(profile.weight_lb, profile.units)} now, ${showWeight(profile.goal_weight_lb, profile.units)} in about ${t.pace.weeks} weeks`;
+
   return (
     <div className="section">
       <div className="sechead">Your week</div>
       <div className="secsub">
-        Target ~2,350 kcal and ~175g protein a day · 180 lbs now, 165 lbs by March.
+        Target ~{t.kcal.toLocaleString()} kcal and ~{t.protein}g protein a day · {goalLine}.
       </div>
 
       <div className="weekgrid">
       {ORDER.map((i) => {
-        const p = PLAN[i];
-        const t = planTotals(p);
+        const p = plan[i];
+        const d = planTotals(p);
         return (
           <div className="daycard" key={i}>
             <h3>
               {p.label} <span className="daytag">{p.focus}</span>
               <em>
-                {t.kcal} kcal · {t.protein}g
+                {d.kcal} kcal · {d.protein}g
               </em>
             </h3>
             {p.gym && (
@@ -35,13 +46,29 @@ export default function WeekPlan() {
                 <div className="wl">
                   {h12(s.time)} · {s.name}
                 </div>
-                <div className="wi">{s.items.map((x) => x.n).join(" · ")}</div>
+                <div className="wi">
+                  {s.items.map((x) => (x.alt ? `or ${itemLabel(x)}` : itemLabel(x))).join(" · ")}
+                </div>
               </div>
             ))}
           </div>
         );
       })}
       </div>
+
+      {prot.short && (
+        <div className="card" style={{ marginBottom: 10, borderColor: "var(--turmeric)" }}>
+          <div className="sechead" style={{ fontSize: 15, color: "var(--turmeric)" }}>
+            Protein runs short on this plan
+          </div>
+          <div className="note">
+            These meals average about {prot.average}g a day against your {t.protein}g target.
+            Getting there on {profile.diet === "vegan" ? "a vegan" : profile.diet === "veg" ? "a vegetarian" : "this"} diet
+            means leaning on the cheapest protein per calorie — soya chunks, tofu, sprouts, Greek
+            yogurt, egg whites or a shake. Search any of those and add one to a meal.
+          </div>
+        </div>
+      )}
 
       <div className="card" style={{ marginBottom: 10 }}>
         <div className="sechead" style={{ fontSize: 15 }}>
@@ -52,7 +79,7 @@ export default function WeekPlan() {
           <br />
           Weigh in twice a week, same time, in the morning. Judge the 3-week trend, not one reading.
           <br />
-          If the average stops falling for 3 weeks, trim ~150 kcal — usually half the rice or one phulka.
+          If the average stops moving for 3 weeks, change the target by ~150 kcal — usually half the rice or one roti.
           <br />
           If you are dropping faster than 1.5 lb a week, eat a bit more or you will lose muscle with the fat.
           <br />

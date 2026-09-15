@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { TARGET, type Entry, type WeighIn } from "@/lib/types";
+import type { Entry, WeighIn } from "@/lib/types";
+import { targetsFor, showWeight, type Profile } from "@/lib/profile";
 import { amountOf, dayKey, parseKey, h12, totalsFor } from "@/lib/day";
 
 const DL = "SMTWTFS";
@@ -10,11 +11,19 @@ export default function Trends({
   entriesByDay,
   weighIns,
   onSaveWeight,
+  profile,
 }: {
   entriesByDay: Map<string, Entry[]>;
   weighIns: WeighIn[];
   onSaveWeight: (lb: number) => Promise<void>;
+  profile: Profile;
 }) {
+  const t = targetsFor(profile);
+  const TARGET = {
+    kcal: t.kcal, protein: t.protein,
+    startLb: profile.weight_lb, goalLb: profile.goal_weight_lb,
+  };
+  const unit = profile.units;
   const today = dayKey(new Date());
   const existing = weighIns.find((w) => w.measured_on === today);
   const [lb, setLb] = useState(existing ? String(existing.lb) : "");
@@ -77,7 +86,7 @@ export default function Trends({
   return (
     <div className="section trendswrap">
       <div className="sechead">Last 14 days</div>
-      <div className="secsub">Bars are calories eaten; the dashed line is your 2,350 target.</div>
+      <div className="secsub">Bars are calories eaten; the dashed line is your {TARGET.kcal.toLocaleString()} target.</div>
 
       <div className="card">
         <div className="bars" style={{ position: "relative" }}>
@@ -132,7 +141,7 @@ export default function Trends({
       <div style={{ height: 18 }} />
       <div className="sechead">Weight</div>
       <div className="secsub">
-        {lost > 0 ? `${lost} lb down · ` : ""}{togo} lb to go. Weigh in twice a week, mornings.
+        {lost > 0 ? `${showWeight(lost, unit)} down · ` : ""}{showWeight(Math.abs(togo), unit)} to go. Weigh in twice a week, mornings.
       </div>
       <div className="card">
         {w.length > 1 ? (
@@ -142,7 +151,7 @@ export default function Trends({
                   stroke="var(--leaf)" strokeWidth="1.5" strokeDasharray="5 4" />
             <text x={W - pad} y={Y(TARGET.goalLb) - 6} textAnchor="end" fontSize="11"
                   fill="var(--leaf)" fontFamily="IBM Plex Mono, monospace">
-              goal {TARGET.goalLb} lb
+              goal {showWeight(TARGET.goalLb, unit)}
             </text>
             <polyline points={w.map((d, i) => `${X(i)},${Y(Number(d.lb))}`).join(" ")}
                       fill="none" stroke="var(--indigo)" strokeWidth="2.5"
@@ -153,7 +162,7 @@ export default function Trends({
             ))}
             <text x={X(w.length - 1)} y={Math.min(H + 16, Y(cur) + 18)} textAnchor="end"
                   fontSize="12" fill="var(--ink)" fontFamily="IBM Plex Mono, monospace">
-              {cur} lb
+              {showWeight(cur, unit)}
             </text>
           </svg>
         ) : (
@@ -171,7 +180,7 @@ export default function Trends({
         >
           <div className="row">
             <div style={{ flex: 1 }}>
-              <label htmlFor="wIn">Weight today (lb)</label>
+              <label htmlFor="wIn">Weight today ({unit})</label>
               <input id="wIn" className="mono" type="number" inputMode="decimal" step="0.1"
                      min="80" max="400" value={lb} placeholder={String(TARGET.startLb)}
                      onChange={(e) => setLb(e.target.value)} />

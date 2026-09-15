@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { PLAN } from "@/lib/plan";
+import { buildPlan, itemKcal, itemLabel, itemProtein, slotTotals } from "@/lib/plan";
+import { targetsFor, showWeight, type Profile } from "@/lib/profile";
+import Logo from "./Logo";
 import {
   FAVES, FOODS, defaultQty, findFoods, foodByName, macrosFor, perUnit, plural, stepOf,
 } from "@/lib/foods";
-import { TARGET, type Entry, type Food, type PlanSlot, type WeighIn } from "@/lib/types";
+import type { Entry, Food, PlanItem, PlanSlot, WeighIn } from "@/lib/types";
 import {
   amountOf, dayKey, h12, hm, nowHM, parseKey, planIdOf, shiftKey, totalsFor,
 } from "@/lib/day";
@@ -21,11 +23,15 @@ const HISTORY_DAYS = 35;
 export default function NutriTrack({
   canEstimate,
   email,
+  profile,
 }: {
   canEstimate: boolean;
   email: string;
+  profile: Profile;
 }) {
   const supabase = useMemo(() => createClient(), []);
+  const PLAN = useMemo(() => buildPlan(profile), [profile]);
+  const TARGET = useMemo(() => targetsFor(profile), [profile]);
 
   const [tab, setTab] = useState<Tab>("today");
   const [key, setKey] = useState(TODAY);
@@ -122,15 +128,16 @@ export default function NutriTrack({
   );
 
   const togglePlanned = useCallback(
-    (slot: PlanSlot, item: { n: string; k: number; p: number; e: string }) => {
+    (slot: PlanSlot, item: PlanItem) => {
       const pid = planIdOf(slot.id, item.n);
       const hit = dayEntries.find((x) => x.plan_id === pid);
       if (hit) return removeEntry(hit.id);
       return addEntry({
         eaten_on: key, eaten_at: key === TODAY() ? nowHM() : slot.time,
-        name: item.n, emoji: item.e, qty: null, unit: null, per_g: false,
+        name: itemLabel(item), emoji: item.e, qty: null, unit: null, per_g: false,
         unit_kcal: null, unit_protein: null,
-        kcal: item.k, protein: item.p, plan_id: pid,
+        kcal: Math.round(itemKcal(item)), protein: Math.round(itemProtein(item) * 10) / 10,
+        plan_id: pid,
       });
     },
     [dayEntries, addEntry, removeEntry, key],
@@ -314,8 +321,7 @@ export default function NutriTrack({
     });
 
   plan.slots.forEach((slot) => {
-    const pk = slot.items.reduce((a, i) => a + i.k, 0);
-    const pp = slot.items.reduce((a, i) => a + i.p, 0);
+    const { kcal: pk, protein: pp } = slotTotals(slot);
     const mine = (ownBySlot.get(slot.id) ?? []).sort((a, b) => a.eaten_at.localeCompare(b.eaten_at));
 
     blocks.push({
@@ -338,10 +344,10 @@ export default function NutriTrack({
                 >
                   <span className="tile" style={{ background: `var(--${slot.tone}-soft)` }}>{it.e}</span>
                   <span className="iname">
-                    {it.n}
+                    {it.alt ? `or ${itemLabel(it)}` : itemLabel(it)}
                     <span className="imac">
-                      <span><b>{it.k}</b> kcal</span>
-                      <span><b>{it.p}</b>g protein</span>
+                      <span><b>{Math.round(itemKcal(it))}</b> kcal</span>
+                      <span><b>{Math.round(itemProtein(it))}</b>g protein</span>
                     </span>
                   </span>
                   {logged && <span className="atime mono">{h12(logged.eaten_at)}</span>}
@@ -368,7 +374,14 @@ export default function NutriTrack({
     <div className="wrap">
       <header>
         <div className="hrow">
-          <div className="brand">Nutri<span>Track</span></div>
+          <Logo size={26} />
+          <a className="iconbtn" href="/setup" title="Edit your details" aria-label="Edit your details">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.63.67 1.1 1.31 1.1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </a>
           <button
             className="iconbtn"
             title={`Sign out of ${email}`}
@@ -426,9 +439,10 @@ export default function NutriTrack({
         {loading ? (
           <div className="loading">Loading your log…</div>
         ) : tab === "week" ? (
-          <WeekPlan />
+          <WeekPlan plan={PLAN} profile={profile} />
         ) : tab === "trends" ? (
-          <Trends entriesByDay={entriesByDay} weighIns={weighIns} onSaveWeight={saveWeight} />
+          <Trends entriesByDay={entriesByDay} weighIns={weighIns}
+                  onSaveWeight={saveWeight} profile={profile} />
         ) : (
           <>
             <div className="slot" style={{ paddingTop: 2 }}>
@@ -606,7 +620,10 @@ export default function NutriTrack({
                   the ring above stays near 2,350.
                 </div>
               )}
-              <div className="whoami">Signed in as {email}</div>
+              <div className="whoami">
+                {profile.name ? `${profile.name} · ` : ""}{email} ·{" "}
+                <a href="/setup" style={{ color: "var(--leaf)" }}>edit my details</a>
+              </div>
             </div>
             </div>
             </div>

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import NutriTrack from "@/components/NutriTrack";
+import type { Profile } from "@/lib/profile";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +19,17 @@ export default async function Home() {
     redirect("/login?error=not_allowed");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+
+  // First visit: ask the questions before showing a plan built on guesses.
+  if (!profile) redirect("/setup");
+
   return (
     <NutriTrack
       canEstimate={!!process.env.ANTHROPIC_API_KEY}
       email={user.email ?? ""}
+      profile={profile as Profile}
     />
   );
 }
