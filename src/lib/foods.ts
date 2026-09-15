@@ -410,7 +410,25 @@ export const FOODS: Food[] = [
  F("Tofu scramble","🍳","cup",220,20,0,"bhurji"),
  F("Paneer, air fried","🧀","g",290,20,1,"grilled cubes airfryer tikka no gravy"),
  F("Paneer bhurji","🧀","cup",300,18,0,"scrambled"),
- F("Soya chunks, dry","🫘","g",345,52,1,"meal maker nutrela uncooked")
+ F("Soya chunks, dry","🫘","g",345,52,1,"meal maker nutrela uncooked"),
+
+ /* ===== Greek yogurt and the high-protein dairy ===== */
+ F("Greek yogurt (plain, nonfat)","🥛","g",59,10,1,"hung curd high protein"),
+ F("Greek yogurt, 1 cup plain","🥛","cup",145,25,0,"nonfat high protein"),
+ F("Greek yogurt (full fat)","🥛","g",97,9,1,"plain"),
+ F("Greek yogurt (flavoured)","🥛","cup",190,18,0,"fruit sweetened"),
+ F("Skyr","🥛","cup",140,25,0,"icelandic high protein"),
+ F("Cottage cheese","🧀","g",98,11,1,"low fat"),
+ F("Hung curd","🥛","cup",180,14,0,"chakka strained yoghurt"),
+
+ /* ===== Protein powders — whey is one of these, not a different thing ===== */
+ F("Whey protein powder","🥤","scoop",120,24,0,"concentrate shake supplement"),
+ F("Whey isolate","🥤","scoop",110,25,0,"protein powder supplement"),
+ F("Casein protein","🥤","scoop",120,24,0,"protein powder slow overnight"),
+ F("Plant protein powder","🥤","scoop",120,21,0,"pea soy vegan supplement"),
+ F("Mass gainer","🥤","scoop",380,20,0,"protein powder bulk"),
+ F("Protein shake with water","🥤","glass",120,24,0,"whey powder"),
+ F("Protein shake with Greek yogurt","🥤","glass",290,45,0,"whey powder")
 
 
 
