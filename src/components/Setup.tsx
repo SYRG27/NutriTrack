@@ -346,22 +346,46 @@ export default function Setup({ initial }: { initial: Profile | null }) {
           <>
             <div className="pvrow">
               <div>
-                <div className="pvlab">Calories a day</div>
-                <div className="pvnum mono">{t.kcal}</div>
+                <div className="pvlab">Eat a day</div>
+                <div className="pvnum mono">{t.kcal.toLocaleString()}</div>
               </div>
               <div>
-                <div className="pvlab">Protein</div>
+                <div className="pvlab">Protein a day</div>
                 <div className="pvnum mono">{t.protein}g</div>
               </div>
               <div>
-                <div className="pvlab">You burn about</div>
-                <div className="pvnum mono">{t.tdee}</div>
+                <div className="pvlab">You burn a day</div>
+                <div className="pvnum mono" style={{ color: "var(--muted)" }}>
+                  {t.tdee.toLocaleString()}
+                </div>
               </div>
             </div>
 
             <div className="pvnote">
+              You burn about <b>{t.tdee.toLocaleString()}</b> a day — your body at rest, your
+              day{" "}
+              {result.profile.gym_when === "none" || result.profile.gym_days === 0
+                ? "with no training on top"
+                : `and ${result.profile.gym_days} gym sessions a week`}
+              .{" "}
               {result.profile.goal === "maintain" ? (
-                <>Eating at roughly what you burn, so the scale holds while you train.</>
+                <>Eating the same holds you where you are.</>
+              ) : t.gap < 0 ? (
+                <>
+                  Eating <b>{t.kcal.toLocaleString()}</b> leaves you {Math.abs(t.gap)} short of
+                  that each day, and it is that gap — not the food itself — that moves the scale.
+                </>
+              ) : (
+                <>
+                  Eating <b>{t.kcal.toLocaleString()}</b> puts you {t.gap} above it each day,
+                  which is the surplus you build on.
+                </>
+              )}
+            </div>
+
+            <div className="pvnote">
+              {result.profile.goal === "maintain" ? (
+                <>Holding steady while you train.</>
               ) : t.pace.capped ? (
                 <span className="pvwarn">
                   {d.months} month{d.months === 1 ? "" : "s"} would mean{" "}
@@ -371,19 +395,12 @@ export default function Setup({ initial }: { initial: Profile | null }) {
                 </span>
               ) : (
                 <>
-                  {t.pace.rate.toFixed(2)} {unit} a week for about{" "}
+                  That is {t.pace.rate.toFixed(2)} {unit} a week for about{" "}
                   {describeDuration(t.pace.weeks)} — the rate that keeps muscle on while the
                   weight moves.
                 </>
               )}
             </div>
-          </>
-        ) : (
-          <div className="pvnote">
-            Still need {"missing" in result ? result.missing.join(", ") : ""}. Your targets appear
-            here as soon as they are in.
-          </div>
-        )}
 
         {error && <div className="pvnote pvwarn">{error}</div>}
         <button className="save" type="submit" disabled={busy || !ready}

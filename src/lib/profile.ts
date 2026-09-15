@@ -40,12 +40,18 @@ export const BLANK_PROFILE: Profile = {
   avoid: [], uses_supplements: true,
 };
 
-const ACTIVITY_FACTOR: Record<Activity, number> = {
-  sedentary: 1.2,   // desk job, little movement
-  light: 1.375,     // light exercise 1-3 days
-  moderate: 1.55,   // training 3-5 days
-  very: 1.725,      // training 6-7 days or physical job
+/* How much you burn above resting, before any training. Training is added on
+   top per session, so the gym answers actually move the number. */
+const DAILY_FACTOR: Record<Activity, number> = {
+  sedentary: 1.2,   // desk job, car everywhere
+  light: 1.3,       // some walking in the day
+  moderate: 1.4,    // on your feet most of the day
+  very: 1.55,       // physical work
 };
+
+const PER_SESSION = 0.03;   // each weekly gym session, on top of the above
+
+export const trains = (p: Profile) => p.gym_when !== "none" && p.gym_days > 0;
 
 export const LB_PER_KG = 2.20462;
 export const toKg = (lb: number) => lb / LB_PER_KG;
@@ -56,8 +62,14 @@ export function bmrFor(p: Profile) {
   return 10 * kg + 6.25 * p.height_cm - 5 * p.age + (p.sex === "male" ? 5 : -161);
 }
 
+export function activityFactor(p: Profile) {
+  const sessions = trains(p) ? Math.min(7, p.gym_days) : 0;
+  return DAILY_FACTOR[p.activity] + sessions * PER_SESSION;
+}
+
+/** Everything you burn in a day: resting burn, living, and training. */
 export function tdeeFor(p: Profile) {
-  return bmrFor(p) * ACTIVITY_FACTOR[p.activity];
+  return bmrFor(p) * activityFactor(p);
 }
 
 /* A pound of bodyweight is about 3,500 kcal, so 1 lb a week is a 500 kcal
@@ -107,11 +119,24 @@ export function targetsFor(p: Profile) {
   const raw =
     p.goal === "maintain" ? tdee : pace.dir === "lose" ? tdee - daily : tdee + daily;
   const kcal = Math.round(Math.max(raw, bmr * 1.1) / 10) * 10;
+  /* Protein protects muscle, so how much you need depends on whether you are
+     building any and whether you are in a deficit. Someone not training does
+     not need a lifter's intake. */
   const kg = toKg(p.weight_lb);
-  const protein = Math.round(
-    kg * (p.goal === "lose" ? 2.0 : p.goal === "gain" ? 1.8 : 1.6),
-  );
-  return { kcal, protein, bmr: Math.round(bmr), tdee: Math.round(tdee), pace };
+  const lifting = trains(p);
+  const perKg =
+    p.goal === "lose" ? (lifting ? 2.0 : 1.6)
+    : p.goal === "gain" ? (lifting ? 1.8 : 1.5)
+    : lifting ? 1.7 : 1.3;
+  const protein = Math.round(kg * perKg);
+
+  return {
+    kcal, protein,
+    bmr: Math.round(bmr),
+    tdee: Math.round(tdee),
+    gap: Math.round(kcal - tdee),     // negative = deficit
+    pace,
+  };
 }
 
 export const KG_PER_LB = 0.453592;
