@@ -397,12 +397,15 @@ export const FOODS: Food[] = [
  F("Protein bar","🍫","bar",220,20,0),
  F("Rice, raw (uncooked)","🍚","g",360,7,1,"biyyam before cooking dry"),
  F("Rice, 1 measuring cup raw","🍚","cup",650,12,0,"200ml glass biyyam uncooked dry"),
- F("Rice, raw (basmati)","🍚","g",350,8,1,"uncooked dry")
+ F("Rice, raw (basmati)","🍚","g",350,8,1,"uncooked dry"),
+ F("Rice + quinoa (cooked)","🍚","cup",215,6,0,"half and half mix standard annam"),
+ F("Quinoa (cooked)","🍚","cup",222,8,0),
+ F("Quinoa, raw (uncooked)","🍚","g",368,14,1,"dry before cooking")
 
 
 
 ];
-export const FAVES: string[] = ["Banana","Boiled egg","Black coffee","Tea with sugar","Curd","White rice (cooked)","Phulka","Whey shake","Trail mix pack","Chicken curry"];
+export const FAVES: string[] = ["Banana","Boiled egg","Black coffee","Tea with sugar","Curd","Rice + quinoa (cooked)","Phulka","Whey shake","Trail mix pack","Chicken curry"];
 
 export const foodByName = (n: string) => FOODS.find((f) => f.n === n);
 export const perUnit = (f: Food) => (f.g ? `${f.k} kcal / 100 g` : `${f.k} kcal per ${f.u}`);
