@@ -11,6 +11,7 @@ export default function WeekPlan() {
         Target ~2,350 kcal and ~175g protein a day · 180 lbs now, 165 lbs by March.
       </div>
 
+      <div className="weekgrid">
       {ORDER.map((i) => {
         const p = PLAN[i];
         const t = planTotals(p);
@@ -40,6 +41,7 @@ export default function WeekPlan() {
           </div>
         );
       })}
+      </div>
 
       <div className="card" style={{ marginBottom: 10 }}>
         <div className="sechead" style={{ fontSize: 15 }}>

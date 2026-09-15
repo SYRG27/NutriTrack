@@ -75,7 +75,7 @@ export default function Trends({
   const Y = (v: number) => pad + ((hi - v) * (H - 2 * pad)) / (hi - lo);
 
   return (
-    <div className="section">
+    <div className="section trendswrap">
       <div className="sechead">Last 14 days</div>
       <div className="secsub">Bars are calories eaten; the dashed line is your 2,350 target.</div>
 

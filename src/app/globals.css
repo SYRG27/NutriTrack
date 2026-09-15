@@ -132,6 +132,13 @@ nav.tabs button[aria-current="true"]{background:var(--ink);color:var(--bg)}
 .ownfoot{display:flex;align-items:center;gap:9px;width:100%;margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
 .oflag{font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--plum)}
 .ownfoot .t{font-family:"IBM Plex Mono",monospace;font-size:12px;padding:4px 6px;width:auto}
+.ownfoot .q{margin-left:auto}
+.savesm{font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:999px;
+  border:1px solid var(--line);color:var(--muted);flex:none}
+.savesm:disabled{cursor:default;opacity:.65}
+.savesm.on{background:var(--leaf);border-color:var(--leaf);color:#fff}
+:root[data-theme="dark"] .savesm.on,:root:not([data-theme="light"]) .savesm.on{color:#0D1512}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .savesm.on{color:#fff}}
 .qtime{display:flex;align-items:center;gap:8px;margin-top:10px}
 .qtime label{font-size:12.5px;color:var(--ink-2);font-weight:500}
 .qtime input{font-family:"IBM Plex Mono",monospace;font-size:14px;padding:7px 9px}
@@ -205,3 +212,39 @@ nav.tabs button[aria-current="true"]{background:var(--ink);color:var(--bg)}
 .iconbtn:hover{background:var(--surface-2);color:var(--chilli)}
 .whoami{font-size:11.5px;color:var(--muted);text-align:center;padding:20px 0 0}
 .loading{display:grid;place-items:center;min-height:60vh;color:var(--muted);font-size:13.5px}
+
+/* ---------- wide screens ----------
+   The phone column is the design; on a desktop it becomes two columns
+   rather than one ribbon of content in the middle of an empty page. */
+@media (min-width: 1000px) {
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, var(--surface-2), transparent 70%),
+      var(--bg);
+  }
+  .wrap{max-width:1060px;padding-bottom:64px}
+  header{padding:0 8px}
+  .hrow{padding:16px 8px 8px}
+  .brand{font-size:23px}
+  .dials{padding:4px 8px 16px;gap:14px}
+  .dial{padding:14px 16px}
+  nav.tabs{padding:0 8px 14px;gap:6px;max-width:460px}
+
+  .todaygrid{
+    display:grid;
+    grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);
+    gap:10px 26px;
+    align-items:start;
+    padding-top:4px;
+  }
+  .colside .section:first-child{padding-top:6px}
+
+  .weekgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .weekgrid .daycard{margin-bottom:0}
+  .trendswrap{max-width:620px;margin:0 auto}
+}
+
+@media (min-width: 1400px) {
+  .wrap{max-width:1180px}
+  .todaygrid{gap:10px 34px}
+}

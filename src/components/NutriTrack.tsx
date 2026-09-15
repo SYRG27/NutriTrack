@@ -40,6 +40,7 @@ export default function NutriTrack({
   const [qty, setQty] = useState(1);
   const [when, setWhen] = useState("");
   const [thinking, setThinking] = useState(false);
+  const [drafts, setDrafts] = useState<Record<string, { time: string; qty: number }>>({});
 
   const say = useCallback((m: string) => {
     setToast(m);
@@ -135,20 +136,39 @@ export default function NutriTrack({
     [dayEntries, addEntry, removeEntry, key],
   );
 
-  const bump = useCallback(
-    (e: Entry, dir: number) => {
-      if (e.qty == null || e.unit_kcal == null || e.unit_protein == null) return;
-      const step = e.per_g ? 25 : 1;
-      const next = Math.round((Number(e.qty) + dir * step) * 100) / 100;
-      if (next <= 0) return removeEntry(e.id);
-      const k = e.per_g ? (Number(e.unit_kcal) * next) / 100 : Number(e.unit_kcal) * next;
-      const p = e.per_g ? (Number(e.unit_protein) * next) / 100 : Number(e.unit_protein) * next;
-      return patchEntry(e.id, {
-        qty: next, kcal: Math.round(k), protein: Math.round(p * 10) / 10,
+  /* Edits are held as a draft until you press Save, so changing a time doesn't
+     make the card jump between meals halfway through typing it. */
+  const draftOf = (e: Entry) => drafts[e.id] ?? { time: hm(e.eaten_at), qty: Number(e.qty ?? 0) };
+  const isDirty = (e: Entry) => {
+    const d = drafts[e.id];
+    return !!d && (d.time !== hm(e.eaten_at) || d.qty !== Number(e.qty ?? 0));
+  };
+  const setDraft = (e: Entry, patch: Partial<{ time: string; qty: number }>) =>
+    setDrafts((prev) => ({ ...prev, [e.id]: { ...draftOf(e), ...patch } }));
+
+  const saveDraft = useCallback(
+    async (e: Entry) => {
+      const d = drafts[e.id];
+      if (!d) return;
+      const patch: Partial<Entry> = { eaten_at: d.time };
+      if (e.qty != null && e.unit_kcal != null && e.unit_protein != null) {
+        const k = e.per_g ? (Number(e.unit_kcal) * d.qty) / 100 : Number(e.unit_kcal) * d.qty;
+        const p = e.per_g ? (Number(e.unit_protein) * d.qty) / 100 : Number(e.unit_protein) * d.qty;
+        patch.qty = d.qty;
+        patch.kcal = Math.round(k);
+        patch.protein = Math.round(p * 10) / 10;
+      }
+      await patchEntry(e.id, patch);
+      setDrafts((prev) => {
+        const next = { ...prev };
+        delete next[e.id];
+        return next;
       });
+      say(`Saved to ${h12(d.time)}`);
     },
-    [patchEntry, removeEntry],
+    [drafts, patchEntry, say],
   );
+
 
   const saveWeight = useCallback(
     async (lb: number) => {
@@ -199,6 +219,78 @@ export default function NutriTrack({
   const plan = PLAN[parseKey(key).getDay()];
   const own = dayEntries.filter((e) => !e.plan_id);
 
+  /* Anything you logged yourself joins the meal whose time it sits closest to,
+     so a banana at 12:39 lands in Lunch rather than floating between meals. */
+  const minutes = (t: string) => {
+    const [h, m] = hm(t).split(":").map(Number);
+    return h * 60 + m;
+  };
+  const ownBySlot = new Map<string, Entry[]>();
+  own.forEach((e) => {
+    let best = plan.slots[0];
+    let bestGap = Infinity;
+    plan.slots.forEach((s) => {
+      const gap = Math.abs(minutes(s.time) - minutes(e.eaten_at));
+      if (gap < bestGap) {
+        bestGap = gap;
+        best = s;
+      }
+    });
+    ownBySlot.set(best.id, [...(ownBySlot.get(best.id) ?? []), e]);
+  });
+
+  function ownCard(e: Entry) {
+    const d = draftOf(e);
+    const changed = isDirty(e);
+    const step = e.per_g ? 25 : 1;
+    const shown = e.per_g
+      ? `${Math.round(d.qty)} g`
+      : `${d.qty % 1 ? d.qty : Math.round(d.qty)} ${plural(e.unit ?? "serving", d.qty)}`;
+
+    return (
+      <div className="item own" key={e.id}>
+        <span className="tile" style={{ background: "var(--plum-soft)" }}>{e.emoji ?? "🍽️"}</span>
+        <span className="iname">
+          {e.name}
+          <span className="imac">
+            <span><b>{Math.round(e.kcal)}</b> kcal</span>
+            <span><b>{Math.round(e.protein * 10) / 10}</b>g protein</span>
+            {e.qty != null && <span>{amountOf(e)}</span>}
+          </span>
+        </span>
+        <button className="x" onClick={() => removeEntry(e.id)} aria-label={`Remove ${e.name}`}>×</button>
+
+        <div className="ownfoot">
+          <span className="oflag">you added</span>
+          <input
+            className="t" type="time" value={d.time} aria-label={`Time for ${e.name}`}
+            onChange={(ev) => ev.target.value && setDraft(e, { time: ev.target.value })}
+          />
+          {e.qty != null && (
+            <span className="q">
+              <button
+                aria-label="Less"
+                onClick={() => setDraft(e, { qty: Math.max(step, Math.round((d.qty - step) * 100) / 100) })}
+              >−</button>
+              <span className="qn">{shown}</span>
+              <button
+                aria-label="More"
+                onClick={() => setDraft(e, { qty: Math.round((d.qty + step) * 100) / 100 })}
+              >+</button>
+            </span>
+          )}
+          <button
+            className={`savesm${changed ? " on" : ""}`}
+            disabled={!changed}
+            onClick={() => saveDraft(e)}
+          >
+            {changed ? "Save" : "Saved"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const blocks: { t: string; o: number; node: React.ReactNode }[] = [];
   if (plan.gym)
     blocks.push({
@@ -217,6 +309,8 @@ export default function NutriTrack({
   plan.slots.forEach((slot) => {
     const pk = slot.items.reduce((a, i) => a + i.k, 0);
     const pp = slot.items.reduce((a, i) => a + i.p, 0);
+    const mine = (ownBySlot.get(slot.id) ?? []).sort((a, b) => a.eaten_at.localeCompare(b.eaten_at));
+
     blocks.push({
       t: slot.time, o: 0,
       node: (
@@ -248,50 +342,13 @@ export default function NutriTrack({
                 </button>
               );
             })}
+            {mine.map((e) => ownCard(e))}
           </div>
         </div>
       ),
     });
   });
 
-  own.forEach((e) => {
-    blocks.push({
-      t: hm(e.eaten_at), o: 2,
-      node: (
-        <div className="slot" key={e.id}>
-          <div className="items">
-            <div className="item own">
-              <span className="tile" style={{ background: "var(--plum-soft)" }}>{e.emoji ?? "🍽️"}</span>
-              <span className="iname">
-                {e.name}
-                <span className="imac">
-                  <span><b>{Math.round(e.kcal)}</b> kcal</span>
-                  <span><b>{Math.round(e.protein * 10) / 10}</b>g protein</span>
-                  {e.qty != null && <span>{amountOf(e)}</span>}
-                </span>
-              </span>
-              <button className="x" onClick={() => removeEntry(e.id)} aria-label={`Remove ${e.name}`}>×</button>
-              <div className="ownfoot">
-                <span className="oflag">you added</span>
-                <input
-                  className="t" type="time" value={hm(e.eaten_at)}
-                  aria-label={`Time for ${e.name}`}
-                  onChange={(ev) => ev.target.value && patchEntry(e.id, { eaten_at: ev.target.value })}
-                />
-                {e.qty != null && (
-                  <span className="q" style={{ marginLeft: "auto" }}>
-                    <button onClick={() => bump(e, -1)} aria-label="Less">−</button>
-                    <span className="qn">{amountOf(e)}</span>
-                    <button onClick={() => bump(e, 1)} aria-label="More">+</button>
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      ),
-    });
-  });
 
   blocks.sort((a, b) => (a.t === b.t ? a.o - b.o : a.t.localeCompare(b.t)));
 
@@ -374,7 +431,9 @@ export default function NutriTrack({
               </div>
             </div>
 
-            {blocks.map((b) => b.node)}
+            <div className="todaygrid">
+            <div className="colmain">{blocks.map((b) => b.node)}</div>
+            <div className="colside">
 
             <div className="section">
               <div className="sechead">Ate something else?</div>
@@ -541,6 +600,8 @@ export default function NutriTrack({
                 </div>
               )}
               <div className="whoami">Signed in as {email}</div>
+            </div>
+            </div>
             </div>
           </>
         )}
