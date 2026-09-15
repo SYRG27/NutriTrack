@@ -617,7 +617,7 @@ export default function NutriTrack({
               {own.length > 0 && (
                 <div className="note">
                   {own.length} off-plan item{own.length === 1 ? "" : "s"} today — that’s fine as long as
-                  the ring above stays near 2,350.
+                  the ring above lands near {TARGET.kcal.toLocaleString()}.
                 </div>
               )}
               <div className="whoami">

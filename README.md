@@ -1,18 +1,30 @@
 # NutriTrack
 
-A personal food log built around one specific 7-day South Indian meal plan and one goal:
-180 lb → 165 lb in six months, keeping the muscle.
+Answer a few questions, get a week of meals built around your numbers, and log what you
+actually eat.
 
-Tick off what you ate from the plan, add anything you ate instead, and watch the calorie and
-protein rings. Everything is yours — your Supabase database, your Vercel project, your data.
+It works out your resting burn, your daily burn, and a calorie and protein target from your
+own timeline — then builds a week of Indian home cooking to match: your diet, your allergies,
+your gym hours, portions sized to your target. Everything you eat off-plan, you search and log.
 
-- **Today** — the day's plan on a clock, gym block included. Tap an item to log it.
-- **Ate something else** — search ~140 South Indian and everyday foods (Telugu names work too:
-  *pappu*, *majjiga*, *chepala pulusu*, *senagalu*), say how much and when. It does the arithmetic.
-  Anything missing gets estimated by Claude.
-- **Week plan** — all seven days with per-day calorie and protein totals.
-- **Trends** — 14-day calorie bars against the 2,350 target, averages, and a weight line to 165 lb.
+- **Setup** — sex, age, height, weight, goal weight, how many weeks, gym timing and days,
+  activity, diet, meals a day, shakes, and anything to keep out. Targets update as you answer.
+  Ask for a pace that would cost you muscle and it says so, then plans the pace that won't.
+- **Today** — your meals on a clock with the gym block in place. Tap to log. Anything you add
+  yourself lands in the meal whose time it belongs to.
+- **Search** — 560+ dishes: South and North Indian home cooking with Telugu and Hindi names as
+  search terms, plus what people actually eat out here — Chipotle, Cava, McDonald's,
+  Chick-fil-A, tacos, Thai, Mexican, Mediterranean, American plates, desserts, fruit, coffee
+  shop drinks and grocery protein. Say how much and when; it does the arithmetic. Anything
+  missing gets estimated.
+- **Week plan** — all seven days with per-day totals, and an honest note when protein can't be
+  reached on that diet at those calories.
+- **Trends** — 14-day calorie bars against your target, averages, and a weight line to your
+  goal, in pounds or kilos.
 - **Export** — your whole log as CSV, any time.
+
+Each person sees only their own data. Postgres row-level security enforces it, so it holds
+even if someone gets hold of the public key.
 
 Stack: Next.js (App Router) · Supabase (Postgres + magic-link auth + row-level security) · Vercel.
 
@@ -23,9 +35,10 @@ Stack: Next.js (App Router) · Supabase (Postgres + magic-link auth + row-level 
 ### 1. Supabase
 
 1. Create a project at [supabase.com](https://supabase.com) (free tier is plenty).
-2. **SQL Editor** → paste all of [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
-   That creates `entries` and `weigh_ins` with row-level security, so rows are readable only by
-   the user who wrote them.
+2. **SQL Editor** → run [`supabase/schema.sql`](supabase/schema.sql), then
+   [`supabase/profiles.sql`](supabase/profiles.sql). Both are safe to re-run.
+3. **Authentication → Sign In / Providers → Email** → turn **Confirm email** off, so signing up
+   logs people straight in instead of mailing them a link.
 3. **Project Settings → API** → copy the **Project URL** and the **anon public** key.
 4. **Authentication → URL Configuration** → set **Site URL** to your Vercel domain and add
    `http://localhost:3000/auth/callback` and `https://YOUR_DOMAIN/auth/callback` to
@@ -73,17 +86,22 @@ On your phone, open the production URL and **Add to Home Screen** — it runs fu
 
 Everything lives in two files, no database migration needed:
 
-- [`src/lib/plan.ts`](src/lib/plan.ts) — the 7-day meal plan: meals, times, gym blocks,
-  per-item calories and protein.
+- [`src/lib/plan.ts`](src/lib/plan.ts) — the base 7-day menu, the diet and allergy swaps, and
+  the portion solver. Items carry per-unit calories and protein so portions can be scaled to
+  anyone's target.
 - [`src/lib/foods.ts`](src/lib/foods.ts) — the food catalogue and the `FAVES` quick-add row.
   A gram-based row (`g` flag) stores its numbers per 100 g; every other row is per unit.
 
-Daily targets are `TARGET` in [`src/lib/types.ts`](src/lib/types.ts).
+Target maths lives in [`src/lib/profile.ts`](src/lib/profile.ts).
 
 ---
 
-## Importing your data from the Claude artifact version
+## A note on the numbers
 
-Download the CSV from the artifact's **Trends** tab, then in the Supabase SQL editor import it
-into `entries` (`date` → `eaten_on`, `time` → `eaten_at`, `item` → `name`, `calories` → `kcal`,
-`protein_g` → `protein`), setting `user_id` to your own `auth.users.id`.
+Nutrition figures are reasonable published values, rounded. Restaurant portions vary by
+location. The calorie maths is Mifflin-St Jeor with standard activity multipliers — a good
+estimate, not a measurement. Treat the first three weeks as calibration: if the scale moves
+faster or slower than the plan says, adjust the target, not the plan.
+
+This is not medical advice. Anyone with a medical condition, or eating well below their
+resting burn, should talk to a doctor or dietitian.

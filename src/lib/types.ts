@@ -58,4 +58,4 @@ export type Entry = {
 export type WeighIn = { measured_on: string; lb: number };
 
 /** Fallback only — a signed-in person's real targets come from their profile. */
-export const TARGET = { kcal: 2350, protein: 175, startLb: 180, goalLb: 165 };
+export const TARGET = { kcal: 2000, protein: 140, startLb: 170, goalLb: 160 };

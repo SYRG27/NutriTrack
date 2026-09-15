@@ -33,8 +33,9 @@ export async function POST(request: NextRequest) {
       model: "claude-opus-5",
       max_tokens: 1024,
       system:
-        "You estimate the nutrition of Indian food. Assume South Indian / Telugu home cooking " +
-        "unless the name says otherwise, and normal home portions.",
+        "You estimate the calories and protein in a single, normal serving of a dish. " +
+        "The people asking are mostly in the USA and eat a lot of Indian food, so read an " +
+        "unqualified Indian dish name as home cooking and a chain name as its standard menu size.",
       messages: [{ role: "user", content: `Estimate one serving of: ${query}` }],
       output_config: { format: zodOutputFormat(Estimate) },
     });

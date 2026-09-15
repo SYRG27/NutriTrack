@@ -1,10 +1,22 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const TAGLINE =
+  "Answer a few questions, get a week of meals built around your numbers, and log what you actually eat.";
+
 export const metadata: Metadata = {
-  title: "NutriTrack",
-  description: "Tell it your numbers, get a week of meals built around them, and log what you actually eat.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://nutri-track-lilac.vercel.app"),
+  title: { default: "NutriTrack", template: "%s · NutriTrack" },
+  description: TAGLINE,
+  applicationName: "NutriTrack",
   appleWebApp: { capable: true, title: "NutriTrack", statusBarStyle: "default" },
+  openGraph: {
+    type: "website",
+    siteName: "NutriTrack",
+    title: "NutriTrack",
+    description: TAGLINE,
+  },
+  twitter: { card: "summary_large_image", title: "NutriTrack", description: TAGLINE },
 };
 
 export const viewport: Viewport = {
