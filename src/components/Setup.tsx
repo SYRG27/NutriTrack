@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Logo from "./Logo";
 import {
-  cmToFtIn, ftInToCm, kgToLb, lbToKg, targetsFor,
+  cmToFtIn, describeDuration, ftInToCm, kgToLb, lbToKg, monthsToWeeks, targetsFor, weeksToMonths,
   type Activity, type Avoid, type Cuisine, type Diet, type GymWhen,
   type Goal, type Profile, type Sex, type Units,
 } from "@/lib/profile";
@@ -43,8 +43,9 @@ type Draft = {
   sex: Sex | "";
   age: string;
   units: Units;
-  ft: string; inch: string; cm: string;
-  weight: string; goalWeight: string; weeks: string;
+  ft: string; inch: string;
+  weight: string; goalWeight: string;
+  months: number | "";
   goal: Goal | "";
   gym_when: GymWhen | "";
   gym_days: number | "";
@@ -58,7 +59,7 @@ type Draft = {
 
 const EMPTY: Draft = {
   name: "", sex: "", age: "", units: "lb",
-  ft: "", inch: "", cm: "", weight: "", goalWeight: "", weeks: "",
+  ft: "", inch: "", weight: "", goalWeight: "", months: "",
   goal: "", gym_when: "", gym_days: "", activity: "", diet: "",
   cuisine: "south", meals_per_day: 5, uses_supplements: true, avoid: [],
 };
@@ -69,8 +70,9 @@ function draftFrom(p: Profile): Draft {
     p.units === "kg" ? String(Math.round(lbToKg(lb) * 10) / 10) : String(Math.round(lb));
   return {
     name: p.name, sex: p.sex, age: String(p.age), units: p.units,
-    ft: String(ft), inch: String(inch), cm: String(Math.round(p.height_cm)),
-    weight: w(p.weight_lb), goalWeight: w(p.goal_weight_lb), weeks: String(p.target_weeks),
+    ft: String(ft), inch: String(inch),
+    weight: w(p.weight_lb), goalWeight: w(p.goal_weight_lb),
+    months: Math.max(1, Math.round(weeksToMonths(p.target_weeks))),
     goal: p.goal, gym_when: p.gym_when, gym_days: p.gym_days, activity: p.activity,
     diet: p.diet, cuisine: p.cuisine, meals_per_day: p.meals_per_day,
     uses_supplements: p.uses_supplements, avoid: p.avoid ?? [],
@@ -86,9 +88,9 @@ function toProfile(d: Draft): { profile: Profile } | { missing: string[] } {
   if (!d.sex) missing.push("sex");
   if (!Number.isFinite(num(d.age))) missing.push("age");
 
-  const height_cm = d.units === "kg"
-    ? num(d.cm)
-    : Number.isFinite(num(d.ft)) ? ftInToCm(num(d.ft), Number.isFinite(num(d.inch)) ? num(d.inch) : 0) : NaN;
+  const height_cm = Number.isFinite(num(d.ft))
+    ? ftInToCm(num(d.ft), Number.isFinite(num(d.inch)) ? num(d.inch) : 0)
+    : NaN;
   if (!Number.isFinite(height_cm) || height_cm < 120) missing.push("height");
 
   const toLb = (v: number) => (d.units === "kg" ? kgToLb(v) : v);
@@ -100,7 +102,7 @@ function toProfile(d: Draft): { profile: Profile } | { missing: string[] } {
     ? weight_lb
     : toLb(num(d.goalWeight));
   if (!Number.isFinite(goal_weight_lb)) missing.push("target weight");
-  if (!Number.isFinite(num(d.weeks)) && d.goal !== "maintain") missing.push("a timeline");
+  if (d.months === "" && d.goal !== "maintain") missing.push("a timeline");
   if (!d.gym_when) missing.push("when you train");
   if (d.gym_days === "" && d.gym_when !== "none") missing.push("days a week");
   if (!d.activity) missing.push("how active your day is");
@@ -115,7 +117,7 @@ function toProfile(d: Draft): { profile: Profile } | { missing: string[] } {
       goal: d.goal as Goal, diet: d.diet as Diet, gym_when: d.gym_when as GymWhen,
       gym_days: d.gym_when === "none" ? 0 : Number(d.gym_days),
       cuisine: d.cuisine,
-      target_weeks: Number.isFinite(num(d.weeks)) ? num(d.weeks) : 12,
+      target_weeks: d.months === "" ? 24 : monthsToWeeks(Number(d.months)),
       units: d.units, meals_per_day: d.meals_per_day,
       avoid: d.avoid, uses_supplements: d.uses_supplements,
     },
@@ -134,6 +136,7 @@ export default function Setup({ initial }: { initial: Profile | null }) {
   const ready = "profile" in result;
   const t = useMemo(() => (ready ? targetsFor(result.profile) : null), [result, ready]);
   const unit = d.units;
+  const kg = d.units === "kg";
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -158,8 +161,6 @@ export default function Setup({ initial }: { initial: Profile | null }) {
     }
     window.location.replace("/");
   }
-
-  const kg = d.units === "kg";
 
   return (
     <form className="setup" onSubmit={save}>
@@ -201,24 +202,18 @@ export default function Setup({ initial }: { initial: Profile | null }) {
 
         <div className="field">
           <span className="fieldlabel">Height</span>
-          {kg ? (
-            <input type="number" inputMode="numeric" min={120} max={220} required
-                   placeholder="centimetres" value={d.cm}
-                   onChange={(e) => set("cm", e.target.value)} />
-          ) : (
-            <div className="pair">
-              <div>
-                <input type="number" inputMode="numeric" min={4} max={7} required
-                       placeholder="feet" value={d.ft}
-                       onChange={(e) => set("ft", e.target.value)} />
-              </div>
-              <div>
-                <input type="number" inputMode="numeric" min={0} max={11}
-                       placeholder="inches" value={d.inch}
-                       onChange={(e) => set("inch", e.target.value)} />
-              </div>
+          <div className="pair">
+            <div>
+              <input type="number" inputMode="numeric" min={4} max={7} required
+                     placeholder="feet" value={d.ft}
+                     onChange={(e) => set("ft", e.target.value)} />
             </div>
-          )}
+            <div>
+              <input type="number" inputMode="numeric" min={0} max={11}
+                     placeholder="inches" value={d.inch}
+                     onChange={(e) => set("inch", e.target.value)} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -251,10 +246,12 @@ export default function Setup({ initial }: { initial: Profile | null }) {
 
         {d.goal !== "maintain" && (
           <div className="field">
-            <label htmlFor="weeks">In how many weeks?</label>
-            <input id="weeks" type="number" inputMode="numeric" min={2} max={104}
-                   placeholder="e.g. 24" value={d.weeks}
-                   onChange={(e) => set("weeks", e.target.value)} />
+            <span className="fieldlabel">In how long?</span>
+            <Seg<number> value={d.months} onChange={(v) => set("months", v)} options={[
+              { v: 1, label: "1 month" }, { v: 2, label: "2" }, { v: 3, label: "3" },
+              { v: 4, label: "4" }, { v: 6, label: "6" }, { v: 9, label: "9" },
+              { v: 12, label: "1 year" },
+            ]} />
           </div>
         )}
       </div>
@@ -367,15 +364,16 @@ export default function Setup({ initial }: { initial: Profile | null }) {
                 <>Eating at roughly what you burn, so the scale holds while you train.</>
               ) : t.pace.capped ? (
                 <span className="pvwarn">
-                  {d.weeks} weeks would mean {t.pace.wanted.toFixed(1)} {unit} a week — too fast,
-                  and most of what you lost would be muscle. This plan runs at{" "}
-                  {t.pace.rate.toFixed(2)} {unit} a week and gets you there in about{" "}
-                  {t.pace.weeks} weeks.
+                  {d.months} month{d.months === 1 ? "" : "s"} would mean{" "}
+                  {t.pace.wanted.toFixed(1)} {unit} a week — too fast, and most of what you lost
+                  would be muscle. This plan runs at {t.pace.rate.toFixed(2)} {unit} a week and
+                  gets you there in about {describeDuration(t.pace.weeks)}.
                 </span>
               ) : (
                 <>
-                  {t.pace.rate.toFixed(2)} {unit} a week for about {t.pace.weeks} weeks — the rate
-                  that keeps muscle on while the weight moves.
+                  {t.pace.rate.toFixed(2)} {unit} a week for about{" "}
+                  {describeDuration(t.pace.weeks)} — the rate that keeps muscle on while the
+                  weight moves.
                 </>
               )}
             </div>

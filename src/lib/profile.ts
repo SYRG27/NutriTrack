@@ -121,6 +121,19 @@ export const kgToLb = (kg: number) => kg / KG_PER_LB;
 export const showWeight = (lb: number, units: Units) =>
   units === "kg" ? `${(lb * KG_PER_LB).toFixed(1)} kg` : `${Math.round(lb * 10) / 10} lb`;
 
+export const WEEKS_PER_MONTH = 4.345;
+export const monthsToWeeks = (m: number) => Math.round(m * WEEKS_PER_MONTH);
+export const weeksToMonths = (w: number) => w / WEEKS_PER_MONTH;
+
+/** People think in months, so say it in months once it is past a few weeks. */
+export function describeDuration(weeks: number) {
+  if (weeks <= 0) return "";
+  if (weeks < 6) return `${weeks} week${weeks === 1 ? "" : "s"}`;
+  const m = weeksToMonths(weeks);
+  const rounded = m < 3 ? Math.round(m * 2) / 2 : Math.round(m);
+  return `${rounded} month${rounded === 1 ? "" : "s"}`;
+}
+
 export const cmToFtIn = (cm: number) => {
   const total = Math.round(cm / 2.54);
   return { ft: Math.floor(total / 12), inch: total % 12 };

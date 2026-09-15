@@ -1,5 +1,5 @@
 import { itemLabel, planTotals, proteinShortfall } from "@/lib/plan";
-import { targetsFor, showWeight, type Profile } from "@/lib/profile";
+import { describeDuration, showWeight, targetsFor, type Profile } from "@/lib/profile";
 import { h12 } from "@/lib/day";
 import type { PlanDay } from "@/lib/types";
 
@@ -13,7 +13,7 @@ export default function WeekPlan({
   const goalLine =
     profile.goal === "maintain"
       ? `holding at ${showWeight(profile.weight_lb, profile.units)}`
-      : `${showWeight(profile.weight_lb, profile.units)} now, ${showWeight(profile.goal_weight_lb, profile.units)} in about ${t.pace.weeks} weeks`;
+      : `${showWeight(profile.weight_lb, profile.units)} now, ${showWeight(profile.goal_weight_lb, profile.units)} in about ${describeDuration(t.pace.weeks)}`;
 
   return (
     <div className="section">
