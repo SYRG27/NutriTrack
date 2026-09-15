@@ -433,7 +433,7 @@ export const FOODS: Food[] = [
 
 
 ];
-export const FAVES: string[] = ["Banana","Boiled egg","Black coffee","Tea with sugar","Curd","Rice + quinoa (cooked)","Phulka","Whey shake","Trail mix pack","Chicken curry"];
+export const FAVES: string[] = ["Banana","Boiled egg","Black coffee","Tea with sugar","Curd","Rice + quinoa (cooked)","Phulka","Whey shake","Greek yogurt, 1 cup plain","Trail mix pack","Chicken curry"];
 
 export const foodByName = (n: string) => FOODS.find((f) => f.n === n);
 export const perUnit = (f: Food) => (f.g ? `${f.k} kcal / 100 g` : `${f.k} kcal per ${f.u}`);

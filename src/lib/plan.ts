@@ -15,7 +15,7 @@ export const PLAN: Record<number, PlanDay> = {
       P(0,"Banana",105,1,"🍌"), P(0,"Roasted chana, 30g",120,7,"🥜"), P(0,"Curd, 1 cup",100,6,"🥛"), P(0,"Trail mix pack",140,4,"🥜")]},
     {id:"pre",time:"18:00", name:"Pre-workout", tone:"indigo", items:[ P(0,"Banana",105,1,"🍌") ]},
     {id:"pg", time:"20:45", name:"Post-gym", tone:"leaf", items:[
-      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"or 4 boiled egg whites",68,14,"🥚")]},
+      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"or 4 boiled egg whites",68,14,"🥚"), P(0,"or Greek yogurt, 1 cup",145,25,"🥛")]},
     {id:"d",  time:"21:15", name:"Dinner", tone:"indigo", items:[
       P(0,"Grilled fish, 150g",250,33,"🐟"), P(0,"Sautéed vegetables",90,3,"🥦"),
       P(0,"Rice + quinoa, ½ cup cooked",110,3,"🍚"), P(0,"Buttermilk",60,3,"🥛")]}
@@ -30,7 +30,7 @@ export const PLAN: Record<number, PlanDay> = {
       P(0,"Apple",95,0,"🍎"), P(0,"Roasted chana, 30g",120,7,"🥜"), P(0,"Trail mix pack",140,4,"🥜")]},
     {id:"pre",time:"18:00", name:"Pre-workout", tone:"indigo", items:[ P(0,"Banana",105,1,"🍌") ]},
     {id:"pg", time:"20:45", name:"Post-gym", tone:"leaf", items:[
-      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"4 boiled egg whites",68,14,"🥚")]},
+      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"or 4 boiled egg whites",68,14,"🥚"), P(0,"or Greek yogurt, 1 cup",145,25,"🥛")]},
     {id:"d",  time:"21:15", name:"Dinner", tone:"indigo", items:[
       P(0,"Chicken tikka, 150g",280,40,"🍗"), P(0,"Kachumber salad",60,2,"🥗"),
       P(0,"Phulka ×2",140,5,"🫓"), P(0,"Buttermilk",60,3,"🥛")]}
@@ -45,7 +45,7 @@ export const PLAN: Record<number, PlanDay> = {
       P(0,"Banana",105,1,"🍌"), P(0,"Sprouts salad",120,8,"🥗"), P(0,"Trail mix pack",140,4,"🥜")]},
     {id:"pre",time:"18:00", name:"Pre-workout", tone:"indigo", items:[ P(0,"Banana",105,1,"🍌") ]},
     {id:"pg", time:"20:45", name:"Post-gym", tone:"leaf", items:[
-      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"4 boiled egg whites",68,14,"🥚")]},
+      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"or 4 boiled egg whites",68,14,"🥚"), P(0,"or Greek yogurt, 1 cup",145,25,"🥛")]},
     {id:"d",  time:"21:15", name:"Dinner", tone:"indigo", items:[
       P(0,"Shrimp stir fry, 180g",260,38,"🦐"), P(0,"Sautéed vegetables",90,3,"🥦"),
       P(0,"Phulka ×1",70,3,"🫓"), P(0,"Buttermilk",60,3,"🥛")]}
@@ -60,7 +60,7 @@ export const PLAN: Record<number, PlanDay> = {
       P(0,"Apple",95,0,"🍎"), P(0,"Almonds ×15",105,4,"🌰"), P(0,"Trail mix pack",140,4,"🥜")]},
     {id:"pre",time:"18:00", name:"Pre-workout", tone:"indigo", items:[ P(0,"Banana",105,1,"🍌") ]},
     {id:"pg", time:"20:45", name:"Post-gym", tone:"leaf", items:[
-      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"4 boiled egg whites",68,14,"🥚")]},
+      P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"or 4 boiled egg whites",68,14,"🥚"), P(0,"or Greek yogurt, 1 cup",145,25,"🥛")]},
     {id:"d",  time:"21:15", name:"Dinner", tone:"indigo", items:[
       P(0,"Fish fry, 150g",270,33,"🐟"), P(0,"Kachumber salad",60,2,"🥗"),
       P(0,"Phulka ×2",140,5,"🫓"), P(0,"Buttermilk",60,3,"🥛")]}
@@ -69,7 +69,7 @@ export const PLAN: Record<number, PlanDay> = {
     {id:"pre",time:"07:15", name:"Pre-workout", tone:"indigo", items:[
       P(0,"Banana",105,1,"🍌"), P(0,"Black coffee",5,0,"☕")]},
     {id:"pg", time:"09:15", name:"Post-gym breakfast", tone:"turmeric", items:[
-      P(0,"Omelette — 3 eggs",200,21,"🍳"), P(0,"Dosa ×1",150,3,"🫓"), P(0,"Whey shake, 1 scoop",120,24,"🥤")]},
+      P(0,"Omelette — 3 eggs",200,21,"🍳"), P(0,"Dosa ×1",150,3,"🫓"), P(0,"Whey shake, 1 scoop",120,24,"🥤"), P(0,"or Greek yogurt, 1 cup",145,25,"🥛")]},
     {id:"l",  time:"13:00", name:"Lunch", tone:"leaf", items:[
       P(0,"Rice + quinoa, 1 cup cooked",215,6,"🍚"), P(0,"Fish curry, 180g",300,38,"🐟"), P(0,"Dal, 1 katori",140,8,"🫘"),
       P(0,"Beans poriyal",80,3,"🥬"), P(0,"Curd, 1 cup",100,6,"🥛")]},
@@ -100,7 +100,7 @@ export const PLAN: Record<number, PlanDay> = {
     {id:"s",  time:"16:30", name:"Evening snack", tone:"plum", items:[
       P(0,"Banana",105,1,"🍌"), P(0,"Almonds ×15",105,4,"🌰"), P(0,"Trail mix pack",140,4,"🥜")]},
     {id:"pre",time:"17:45", name:"Pre-workout (if gym)", tone:"indigo", items:[ P(0,"Banana",105,1,"🍌") ]},
-    {id:"pg", time:"20:15", name:"Post-gym (if gym)", tone:"leaf", items:[ P(0,"Whey shake, 1 scoop",120,24,"🥤") ]},
+    {id:"pg", time:"20:15", name:"Post-gym (if gym)", tone:"leaf", items:[ P(0,"Whey shake, 1 scoop",120,24,"🥤") , P(0,"or Greek yogurt, 1 cup",145,25,"🥛")]},
     {id:"d",  time:"20:30", name:"Dinner", tone:"indigo", items:[
       P(0,"Grilled shrimp, 150g",250,33,"🦐"), P(0,"Sautéed vegetables",90,3,"🥦"),
       P(0,"Phulka ×1",70,3,"🫓"), P(0,"Buttermilk",60,3,"🥛")]}
