@@ -113,6 +113,7 @@ nav.tabs button[aria-current="true"]{background:var(--ink);color:var(--bg)}
 .form input,.form select{width:100%;min-width:0}
 .form label{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;display:block;margin-bottom:3px}
 .save{background:var(--leaf);color:#fff;border-radius:10px;padding:11px;font-weight:600;font-size:14.5px}
+.save:disabled{background:var(--line);color:var(--muted);cursor:default}
 :root[data-theme="dark"] .save,:root:not([data-theme="light"]) .save{color:#0D1512}
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .save{color:#fff}}
 

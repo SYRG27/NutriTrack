@@ -29,11 +29,14 @@ export type Profile = {
   uses_supplements: boolean; // false = whole-food protein instead of shakes
 };
 
+/** Neutral stand-in, used only where a Profile is needed before one exists
+ *  (tests, previews). The questionnaire starts empty — nothing here is
+ *  shown to anyone as a default. */
 export const BLANK_PROFILE: Profile = {
-  name: "", sex: "male", age: 25, height_cm: 183, weight_lb: 180,
-  goal_weight_lb: 165, activity: "moderate", goal: "lose",
-  diet: "nonveg", gym_when: "evening", gym_days: 5, cuisine: "south",
-  target_weeks: 26, units: "lb", meals_per_day: 5,
+  name: "", sex: "male", age: 30, height_cm: 175, weight_lb: 170,
+  goal_weight_lb: 160, activity: "moderate", goal: "lose",
+  diet: "nonveg", gym_when: "evening", gym_days: 4, cuisine: "south",
+  target_weeks: 20, units: "lb", meals_per_day: 5,
   avoid: [], uses_supplements: true,
 };
 
