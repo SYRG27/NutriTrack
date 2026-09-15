@@ -195,5 +195,13 @@ nav.tabs button[aria-current="true"]{background:var(--ink);color:var(--bg)}
 .authcard .save{width:100%}
 .authmsg{font-size:13px;margin-top:12px;color:var(--leaf);line-height:1.5}
 .authmsg.bad{color:var(--chilli)}
-.signout{font-size:11px;color:var(--muted);text-decoration:underline;padding:0}
+.authtabs{display:flex;gap:4px;margin:0 0 16px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:999px;padding:3px}
+.authtabs button{flex:1;padding:8px 0;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.authtabs button[aria-current="true"]{background:var(--ink);color:var(--bg)}
+.authswap{font-size:12.5px;color:var(--muted);margin:14px 0 0;text-align:center}
+.authswap button{color:var(--leaf);font-weight:600;text-decoration:underline;padding:0;font-size:12.5px}
+.iconbtn{width:30px;height:30px;border-radius:8px;color:var(--muted);display:grid;place-items:center;flex:none}
+.iconbtn:hover{background:var(--surface-2);color:var(--chilli)}
+.whoami{font-size:11.5px;color:var(--muted);text-align:center;padding:20px 0 0}
 .loading{display:grid;place-items:center;min-height:60vh;color:var(--muted);font-size:13.5px}

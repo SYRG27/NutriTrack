@@ -18,5 +18,10 @@ export default async function Home() {
     redirect("/login?error=not_allowed");
   }
 
-  return <NutriTrack canEstimate={!!process.env.ANTHROPIC_API_KEY} />;
+  return (
+    <NutriTrack
+      canEstimate={!!process.env.ANTHROPIC_API_KEY}
+      email={user.email ?? ""}
+    />
+  );
 }

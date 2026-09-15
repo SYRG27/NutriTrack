@@ -18,7 +18,13 @@ type Tab = "today" | "week" | "trends";
 const TODAY = () => dayKey(new Date());
 const HISTORY_DAYS = 35;
 
-export default function NutriTrack({ canEstimate }: { canEstimate: boolean }) {
+export default function NutriTrack({
+  canEstimate,
+  email,
+}: {
+  canEstimate: boolean;
+  email: string;
+}) {
   const supabase = useMemo(() => createClient(), []);
 
   const [tab, setTab] = useState<Tab>("today");
@@ -299,6 +305,22 @@ export default function NutriTrack({ canEstimate }: { canEstimate: boolean }) {
       <header>
         <div className="hrow">
           <div className="brand">Nutri<span>Track</span></div>
+          <button
+            className="iconbtn"
+            title={`Sign out of ${email}`}
+            aria-label={`Sign out of ${email}`}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              window.location.href = "/login";
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
           <div className="datenav">
             <button onClick={() => setKey((k) => shiftKey(k, -1))} aria-label="Previous day">‹</button>
             <div className="datelabel">
@@ -518,12 +540,7 @@ export default function NutriTrack({ canEstimate }: { canEstimate: boolean }) {
                   the ring above stays near 2,350.
                 </div>
               )}
-              <div style={{ padding: "18px 0 0", textAlign: "center" }}>
-                <button className="signout" onClick={async () => {
-                  await supabase.auth.signOut();
-                  window.location.href = "/login";
-                }}>Sign out</button>
-              </div>
+              <div className="whoami">Signed in as {email}</div>
             </div>
           </>
         )}
