@@ -10,7 +10,7 @@ import {
 } from "@/lib/foods";
 import type { Entry, Food, PlanItem, PlanSlot, WeighIn } from "@/lib/types";
 import {
-  amountOf, dayKey, h12, hm, nowHM, parseKey, planIdOf, shiftKey, totalsFor,
+  amountOf, dayKey, fmtQty, h12, hm, nowHM, parseKey, planIdOf, shiftKey, totalsFor, unitFor,
 } from "@/lib/day";
 import Dial from "./Dial";
 import WeekPlan from "./WeekPlan";
@@ -259,7 +259,7 @@ export default function NutriTrack({
     const step = e.per_g ? 25 : 1;
     const shown = e.per_g
       ? `${Math.round(d.qty)} g`
-      : `${d.qty % 1 ? d.qty : Math.round(d.qty)} ${plural(e.unit ?? "serving", d.qty)}`;
+      : `${fmtQty(d.qty)} ${unitFor(e.unit ?? "serving", d.qty)}`;
 
     return (
       <div className="item own" key={e.id}>
@@ -544,7 +544,7 @@ export default function NutriTrack({
                           if (Number.isFinite(v) && v > 0) setQty(v);
                         }}
                       />
-                      <span className="qu">{pick.g ? "grams" : plural(pick.u, qty)}</span>
+                      <span className="qu">{pick.g ? "grams" : unitFor(pick.u, qty)}</span>
                       <button aria-label="More"
                               onClick={() => setQty((v) => Math.round((v + stepOf(pick)) * 100) / 100)}>+</button>
                     </div>

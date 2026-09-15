@@ -30,13 +30,32 @@ export const h12 = (t: string) => {
 
 export const planIdOf = (slotId: string, name: string) => `${slotId}|${name}`;
 
+/** Quarters read as quarters: 0.75 is three quarters of a cup, not 0.75 of one. */
+const VULGAR: Record<string, string> = { "0.25": "\u00BC", "0.5": "\u00BD", "0.75": "\u00BE" };
+
+export function fmtQty(q: number) {
+  const rounded = Math.round(q * 100) / 100;
+  const whole = Math.floor(rounded);
+  const frac = VULGAR[String(Math.round((rounded - whole) * 100) / 100)];
+  if (frac) return whole ? `${whole}${frac}` : frac;
+  return String(rounded);
+}
+
+/* Dish names that read wrong with an English plural on them. */
+const INVARIANT = new Set(["pesarattu", "idiyappam", "upma", "poha", "rice", "sambar", "dal"]);
+
+/** "cup" stays "cup" for anything up to one, and for a fraction of one. */
+export function unitFor(unit: string, q: number) {
+  if (unit === "g") return "g";
+  if (q <= 1 || INVARIANT.has(unit)) return unit;
+  return /(s|sh|ch|x)$/.test(unit) ? `${unit}es` : `${unit}s`;
+}
+
 export const amountOf = (e: Entry) => {
   if (e.qty == null) return "";
   if (e.per_g) return `${Math.round(e.qty)} g`;
   const u = e.unit ?? "serving";
-  const q = e.qty % 1 ? e.qty : Math.round(e.qty);
-  const unit = e.qty <= 1 ? u : /(s|sh|ch|x)$/.test(u) ? `${u}es` : `${u}s`;
-  return `${q} ${unit}`;
+  return `${fmtQty(e.qty)} ${unitFor(u, e.qty)}`;
 };
 
 export const totalsFor = (entries: Entry[]) =>

@@ -1,6 +1,7 @@
 import type { PlanDay, PlanItem, PlanSlot, FoodTag } from "./types";
 import type { Avoid, Diet, Like, Profile } from "./profile";
 import { SPLIT_LABEL, isTrainingDay, splitFor, targetsFor } from "./profile";
+import { fmtQty, unitFor } from "./day";
 
 /* ---------------------------------------------------------------------------
    Pools of Telugu home cooking. A person's plan is assembled from the ones
@@ -249,10 +250,8 @@ export function planTotals(day: PlanDay) {
 
 export function itemLabel(i: PlanItem) {
   if (i.u === "g") return `${i.n}, ${Math.round(i.q)}g`;
-  if (i.q === 1 && (i.u === "serving" || i.u === "bowl")) return i.n;
-  const q = i.q % 1 ? i.q : Math.round(i.q);
-  const unit = i.q <= 1 ? i.u : /(s|sh|ch|x)$/.test(i.u) ? `${i.u}es` : `${i.u}s`;
-  return `${i.n}, ${q} ${unit}`;
+  if (i.q === 1 && (i.u === "serving" || i.u === "bowl" || i.u === "plate")) return i.n;
+  return `${i.n}, ${fmtQty(i.q)} ${unitFor(i.u, i.q)}`;
 }
 
 /* ------------------------------- scaling -------------------------------
