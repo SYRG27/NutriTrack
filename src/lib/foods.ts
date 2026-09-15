@@ -288,7 +288,90 @@ export const FOODS: Food[] = [
  F("Nimmakaya juice","🍋","glass",90,0,0,"lemon juice"),
  F("Badam milk","🥛","glass",220,8,0),
  F("Irani chai","☕","cup",120,3,0),
- F("Malt drink","🥛","glass",180,7,0,"horlicks boost")
+ F("Malt drink","🥛","glass",180,7,0,"horlicks boost"),
+
+ /* ===== North Indian — dals and legumes ===== */
+ F("Dal makhani","🫘","cup",290,11,0,"black urad rajma creamy"),
+ F("Dal tadka","🫘","katori",170,9,0,"yellow dal fry"),
+ F("Dal fry","🫘","katori",180,9,0),
+ F("Chana dal","🫘","katori",180,10,0,"senagapappu"),
+ F("Moong dal","🫘","katori",150,9,0,"pesarapappu"),
+ F("Masoor dal","🫘","katori",160,9,0,"red lentil"),
+ F("Lobia curry","🫘","cup",230,12,0,"black eyed peas bobbarlu"),
+ F("Chole","🫘","cup",270,12,0,"chickpea curry punjabi"),
+ F("Chole bhature","🍛","plate",700,18,0),
+ F("Rajma chawal","🍛","plate",560,18,0,"kidney bean rice"),
+ F("Kadhi pakora","🥛","cup",230,7,0,"besan yoghurt"),
+ F("Soya chunks curry","🫘","cup",250,25,0,"meal maker"),
+
+ /* ===== North Indian — paneer and vegetables ===== */
+ F("Paneer butter masala","🧀","cup",380,16,0,"makhani"),
+ F("Shahi paneer","🧀","cup",360,16,0),
+ F("Matar paneer","🧀","cup",300,15,0,"peas paneer"),
+ F("Kadai paneer","🧀","cup",320,16,0),
+ F("Paneer tikka","🧀","g",220,20,1),
+ F("Malai kofta","🧀","cup",400,10,0),
+ F("Aloo gobi","🥔","serving",180,4,0,"cauliflower potato"),
+ F("Aloo matar","🥔","serving",190,6,0),
+ F("Jeera aloo","🥔","serving",170,3,0,"cumin potato"),
+ F("Baingan bharta","🍆","cup",190,4,0,"smoked brinjal"),
+ F("Bhindi masala","🥬","serving",170,3,0,"okra"),
+ F("Dum aloo","🥔","cup",260,5,0),
+ F("Mixed veg (North)","🥘","cup",200,5,0,"sabzi"),
+ F("Sarson ka saag","🌿","cup",210,7,0,"mustard greens"),
+
+ /* ===== North Indian — meat ===== */
+ F("Butter chicken","🍗","g",210,22,1,"murgh makhani"),
+ F("Chicken tikka masala","🍗","g",195,23,1),
+ F("Kadai chicken","🍗","g",190,24,1),
+ F("Chicken korma","🍗","g",220,22,1),
+ F("Rogan josh","🍛","g",250,23,1,"mutton kashmiri"),
+ F("Mutton keema","🍛","g",260,24,1,"minced goat"),
+ F("Fish tikka","🐟","g",175,23,1),
+ F("Chicken seekh kebab","🍢","kebab",120,11,0),
+
+ /* ===== North Indian — breads and rice ===== */
+ F("Butter naan","🫓","naan",300,8,0),
+ F("Garlic naan","🫓","naan",310,8,0),
+ F("Tandoori roti","🫓","roti",130,4,0),
+ F("Lachha paratha","🫓","paratha",290,6,0),
+ F("Aloo paratha","🫓","paratha",330,7,0),
+ F("Paneer paratha","🫓","paratha",360,12,0),
+ F("Missi roti","🫓","roti",180,6,0),
+ F("Bhatura","🫓","bhatura",270,5,0),
+ F("Kulcha","🫓","kulcha",240,6,0),
+ F("Jeera rice","🍚","cup",240,4,0,"cumin rice"),
+
+ /* ===== Street food and chaat ===== */
+ F("Pav bhaji","🍛","plate",600,12,0),
+ F("Vada pav","🍔","piece",290,6,0),
+ F("Aloo tikki","🥔","tikki",150,3,0),
+ F("Pani puri","🥟","6 pieces",180,4,0,"golgappa puchka"),
+ F("Bhel puri","🥗","plate",250,6,0),
+ F("Sev puri","🥗","plate",280,6,0),
+ F("Dahi puri","🥗","plate",300,7,0),
+ F("Papdi chaat","🥗","plate",320,7,0),
+ F("Veg momos","🥟","6 pieces",240,7,0,"dumpling"),
+ F("Chicken momos","🥟","6 pieces",300,16,0),
+ F("Spring roll","🥟","roll",190,4,0),
+
+ /* ===== Accompaniments ===== */
+ F("Boondi raita","🥛","cup",150,5,0),
+ F("Cucumber raita","🥛","cup",90,4,0),
+ F("Green chutney","🌿","2 tbsp",40,1,0,"mint coriander"),
+ F("Onion salad","🧅","serving",45,1,0,"laccha"),
+
+ /* ===== North Indian sweets and drinks ===== */
+ F("Rasgulla","🍮","piece",125,3,0),
+ F("Rasmalai","🍮","piece",190,5,0),
+ F("Gajar ka halwa","🍮","serving",320,5,0,"carrot halwa"),
+ F("Kaju barfi","🍬","piece",130,2,0),
+ F("Soan papdi","🍬","piece",110,1,0),
+ F("Kulfi","🍨","piece",200,4,0),
+ F("Salted lassi","🥛","glass",110,6,0,"namkeen chaas"),
+ F("Masala chai","☕","cup",100,2,0),
+ F("Thandai","🥛","glass",230,7,0)
+
 
 ];
 export const FAVES: string[] = ["Banana","Boiled egg","Black coffee","Tea with sugar","Curd","White rice (cooked)","Phulka","Whey shake","Buttermilk","Chicken curry"];
