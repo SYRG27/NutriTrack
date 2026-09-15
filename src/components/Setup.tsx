@@ -132,6 +132,20 @@ export default function Setup({ initial }: { initial: Profile | null }) {
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) =>
     setD((prev) => ({ ...prev, [k]: v }));
 
+  /** Switching lb <-> kg converts what is typed; 190 lb becomes 86.2 kg. */
+  function setUnits(next: Units) {
+    setD((prev) => {
+      if (prev.units === next) return prev;
+      const conv = (v: string) => {
+        const n = Number(v);
+        if (v.trim() === "" || !Number.isFinite(n)) return v;
+        const out = next === "kg" ? lbToKg(n) : kgToLb(n);
+        return String(Math.round(out * 10) / 10);
+      };
+      return { ...prev, units: next, weight: conv(prev.weight), goalWeight: conv(prev.goalWeight) };
+    });
+  }
+
   const result = useMemo(() => toProfile(d), [d]);
   const ready = "profile" in result;
   const t = useMemo(() => (ready ? targetsFor(result.profile) : null), [result, ready]);
@@ -195,7 +209,7 @@ export default function Setup({ initial }: { initial: Profile | null }) {
           </div>
           <div className="field">
             <span className="fieldlabel">Your scale reads</span>
-            <Seg<Units> value={d.units} onChange={(v) => set("units", v)}
+            <Seg<Units> value={d.units} onChange={setUnits}
               options={[{ v: "lb", label: "Pounds" }, { v: "kg", label: "Kilos" }]} />
           </div>
         </div>
@@ -401,6 +415,13 @@ export default function Setup({ initial }: { initial: Profile | null }) {
                 </>
               )}
             </div>
+          </>
+        ) : (
+          <div className="pvnote">
+            Still need {"missing" in result ? result.missing.join(", ") : ""}. Your targets appear
+            here as soon as they are in.
+          </div>
+        )}
 
         {error && <div className="pvnote pvwarn">{error}</div>}
         <button className="save" type="submit" disabled={busy || !ready}
