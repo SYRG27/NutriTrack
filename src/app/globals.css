@@ -276,6 +276,12 @@ nav.tabs button[aria-current="true"]{background:var(--ink);color:var(--bg)}
 .avoid button{border:1px solid var(--line);background:var(--surface);border-radius:999px;
   padding:7px 13px;font-size:13px;color:var(--ink-2)}
 .avoid button[aria-pressed="true"]{border-color:var(--chilli);background:var(--chilli-soft);color:var(--chilli);font-weight:600}
+.avoid button.liked[aria-pressed="true"]{border-color:var(--leaf);background:var(--leaf-soft);color:var(--leaf)}
+.week{display:grid;gap:6px}
+.weekrow{display:flex;align-items:center;gap:10px}
+.weekrow .wd{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+  color:var(--muted);width:34px;flex:none;text-transform:uppercase;letter-spacing:.04em}
+.weekrow select{flex:1;min-width:0}
 .preview{position:sticky;bottom:12px;background:var(--surface);border:1px solid var(--leaf);
   border-radius:var(--r);padding:14px;box-shadow:var(--shadow);margin-top:8px}
 .preview .pvrow{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}

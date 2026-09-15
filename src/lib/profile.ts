@@ -8,6 +8,39 @@ export type Units = "lb" | "kg";
 /** Things to keep out of the plan entirely, beyond the diet choice. */
 export type Avoid = "dairy" | "nuts" | "gluten" | "seafood" | "beef" | "pork" | "onion_garlic";
 
+/** What they train on a given day. "rest" means no gym that day. */
+export type Split =
+  | "rest" | "chest_back" | "arms" | "legs" | "shoulders" | "push" | "pull"
+  | "full_body" | "cardio" | "core";
+
+export const SPLIT_LABEL: Record<Split, string> = {
+  rest: "Rest",
+  chest_back: "Chest + Back",
+  arms: "Biceps + Triceps",
+  legs: "Legs + Abs",
+  shoulders: "Shoulders + Back",
+  push: "Push",
+  pull: "Pull",
+  full_body: "Full body",
+  cardio: "Cardio only",
+  core: "Core + mobility",
+};
+
+export const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+export type DayKey = (typeof DAY_KEYS)[number];
+export const DAY_LABEL: Record<DayKey, string> = {
+  sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday",
+  thu: "Thursday", fri: "Friday", sat: "Saturday",
+};
+
+/** Which dishes they actually want to see in their plan. */
+export type Like =
+  | "idli" | "dosa" | "pesarattu" | "upma" | "poha" | "curd_rice" | "idiyappam"
+  | "oats" | "eggs" | "paratha"
+  | "chicken" | "fish" | "prawns" | "goat" | "egg_curry" | "paneer" | "tofu"
+  | "soya" | "dal"
+  | "fruit" | "nuts" | "sprouts" | "yogurt" | "chana";
+
 export type Profile = {
   user_id?: string;
   name: string;
@@ -27,6 +60,9 @@ export type Profile = {
   meals_per_day: number;  // 3 = no snacks, 4 = plus a snack, 5 = every slot
   avoid: Avoid[];         // allergies and things they will not eat
   uses_supplements: boolean; // false = whole-food protein instead of shakes
+  splits: Record<string, Split>;  // what they train each day of the week
+  gym_time: string;       // "HH:MM" they like to start
+  likes: Like[];          // dishes they want their plan built from
 };
 
 /** Neutral stand-in, used only where a Profile is needed before one exists
@@ -38,7 +74,23 @@ export const BLANK_PROFILE: Profile = {
   diet: "nonveg", gym_when: "evening", gym_days: 4, cuisine: "south",
   target_weeks: 20, units: "lb", meals_per_day: 5,
   avoid: [], uses_supplements: true,
+  splits: {
+    mon: "chest_back", tue: "arms", wed: "legs", thu: "shoulders",
+    fri: "full_body", sat: "rest", sun: "rest",
+  },
+  gym_time: "19:00",
+  likes: [],
 };
+
+/** Days they actually train, from the per-day splits. */
+export const trainingDays = (p: Profile) =>
+  DAY_KEYS.filter((d) => (p.splits?.[d] ?? "rest") !== "rest");
+
+export const splitFor = (p: Profile, dayIndex: number): Split =>
+  (p.splits?.[DAY_KEYS[dayIndex]] as Split) ?? "rest";
+
+export const isTrainingDay = (p: Profile, dayIndex: number) =>
+  splitFor(p, dayIndex) !== "rest";
 
 /* How much you burn above resting, before any training. Training is added on
    top per session, so the gym answers actually move the number. */
@@ -51,7 +103,7 @@ const DAILY_FACTOR: Record<Activity, number> = {
 
 const PER_SESSION = 0.03;   // each weekly gym session, on top of the above
 
-export const trains = (p: Profile) => p.gym_when !== "none" && p.gym_days > 0;
+export const trains = (p: Profile) => trainingDays(p).length > 0;
 
 export const LB_PER_KG = 2.20462;
 export const toKg = (lb: number) => lb / LB_PER_KG;
@@ -63,7 +115,7 @@ export function bmrFor(p: Profile) {
 }
 
 export function activityFactor(p: Profile) {
-  const sessions = trains(p) ? Math.min(7, p.gym_days) : 0;
+  const sessions = Math.min(7, trainingDays(p).length);
   return DAILY_FACTOR[p.activity] + sessions * PER_SESSION;
 }
 

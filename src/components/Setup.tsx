@@ -5,8 +5,9 @@ import { createClient } from "@/lib/supabase/client";
 import Logo from "./Logo";
 import {
   cmToFtIn, describeDuration, ftInToCm, kgToLb, lbToKg, monthsToWeeks, targetsFor, weeksToMonths,
-  type Activity, type Avoid, type Cuisine, type Diet, type GymWhen,
-  type Goal, type Profile, type Sex, type Units,
+  DAY_KEYS, DAY_LABEL, SPLIT_LABEL,
+  type Activity, type Avoid, type Cuisine, type DayKey, type Diet, type Like,
+  type Goal, type Profile, type Sex, type Split, type Units,
 } from "@/lib/profile";
 
 type Opt<T> = { v: T; label: string; hint?: string };
@@ -37,6 +38,47 @@ const AVOIDS: { v: Avoid; label: string }[] = [
   { v: "onion_garlic", label: "Onion & garlic" },
 ];
 
+const SPLIT_OPTIONS: Split[] = [
+  "rest", "chest_back", "arms", "legs", "shoulders", "push", "pull",
+  "full_body", "cardio", "core",
+];
+
+const PRESETS: { label: string; splits: Record<DayKey, Split> }[] = [
+  { label: "Mon–Fri", splits: { mon: "chest_back", tue: "arms", wed: "legs",
+      thu: "shoulders", fri: "full_body", sat: "rest", sun: "rest" } },
+  { label: "3 days", splits: { mon: "push", tue: "rest", wed: "pull", thu: "rest",
+      fri: "legs", sat: "rest", sun: "rest" } },
+  { label: "6 days", splits: { mon: "chest_back", tue: "arms", wed: "legs",
+      thu: "shoulders", fri: "full_body", sat: "cardio", sun: "rest" } },
+  { label: "Not training", splits: { mon: "rest", tue: "rest", wed: "rest",
+      thu: "rest", fri: "rest", sat: "rest", sun: "rest" } },
+];
+
+const LIKE_GROUPS: { title: string; hint: string; options: { v: Like; label: string }[] }[] = [
+  { title: "Breakfasts you would actually eat", hint: "Pick a few — your week rotates through them.",
+    options: [
+      { v: "idli", label: "Idli & sambar" }, { v: "dosa", label: "Dosa" },
+      { v: "pesarattu", label: "Pesarattu" }, { v: "upma", label: "Upma" },
+      { v: "poha", label: "Poha" }, { v: "curd_rice", label: "Curd rice" },
+      { v: "idiyappam", label: "Idiyappam" }, { v: "oats", label: "Oats" },
+      { v: "eggs", label: "Eggs" }, { v: "paratha", label: "Paratha" },
+    ] },
+  { title: "Proteins you like", hint: "These anchor your lunches and dinners.",
+    options: [
+      { v: "chicken", label: "Chicken" }, { v: "fish", label: "Fish" },
+      { v: "prawns", label: "Prawns" }, { v: "goat", label: "Goat / mutton" },
+      { v: "egg_curry", label: "Egg curry" }, { v: "paneer", label: "Paneer" },
+      { v: "tofu", label: "Tofu" }, { v: "soya", label: "Soya chunks" },
+      { v: "dal", label: "Dal only" },
+    ] },
+  { title: "Evening snacks", hint: "",
+    options: [
+      { v: "fruit", label: "Fruit" }, { v: "nuts", label: "Trail mix" },
+      { v: "sprouts", label: "Sprouts" }, { v: "yogurt", label: "Greek yogurt" },
+      { v: "chana", label: "Roasted chana" },
+    ] },
+];
+
 /** The form's own shape: everything a person types starts empty. */
 type Draft = {
   name: string;
@@ -47,8 +89,9 @@ type Draft = {
   weight: string; goalWeight: string;
   months: number | "";
   goal: Goal | "";
-  gym_when: GymWhen | "";
-  gym_days: number | "";
+  splits: Record<DayKey, Split>;
+  gym_time: string;
+  likes: Like[];
   activity: Activity | "";
   diet: Diet | "";
   cuisine: Cuisine;
@@ -60,7 +103,10 @@ type Draft = {
 const EMPTY: Draft = {
   name: "", sex: "", age: "", units: "lb",
   ft: "", inch: "", weight: "", goalWeight: "", months: "",
-  goal: "", gym_when: "", gym_days: "", activity: "", diet: "",
+  goal: "",
+  splits: { mon: "rest", tue: "rest", wed: "rest", thu: "rest", fri: "rest", sat: "rest", sun: "rest" },
+  gym_time: "19:00", likes: [],
+  activity: "", diet: "",
   cuisine: "south", meals_per_day: 5, uses_supplements: true, avoid: [],
 };
 
@@ -73,7 +119,11 @@ function draftFrom(p: Profile): Draft {
     ft: String(ft), inch: String(inch),
     weight: w(p.weight_lb), goalWeight: w(p.goal_weight_lb),
     months: Math.max(1, Math.round(weeksToMonths(p.target_weeks))),
-    goal: p.goal, gym_when: p.gym_when, gym_days: p.gym_days, activity: p.activity,
+    goal: p.goal,
+    splits: (p.splits as Record<DayKey, Split>) ?? EMPTY.splits,
+    gym_time: p.gym_time ?? "19:00",
+    likes: p.likes ?? [],
+    activity: p.activity,
     diet: p.diet, cuisine: p.cuisine, meals_per_day: p.meals_per_day,
     uses_supplements: p.uses_supplements, avoid: p.avoid ?? [],
   };
@@ -103,10 +153,10 @@ function toProfile(d: Draft): { profile: Profile } | { missing: string[] } {
     : toLb(num(d.goalWeight));
   if (!Number.isFinite(goal_weight_lb)) missing.push("target weight");
   if (d.months === "" && d.goal !== "maintain") missing.push("a timeline");
-  if (!d.gym_when) missing.push("when you train");
-  if (d.gym_days === "" && d.gym_when !== "none") missing.push("days a week");
   if (!d.activity) missing.push("how active your day is");
   if (!d.diet) missing.push("what you eat");
+
+  const trainingCount = DAY_KEYS.filter((k) => d.splits[k] !== "rest").length;
 
   if (missing.length) return { missing };
 
@@ -114,8 +164,12 @@ function toProfile(d: Draft): { profile: Profile } | { missing: string[] } {
     profile: {
       name: d.name.trim(), sex: d.sex as Sex, age: num(d.age), height_cm,
       weight_lb, goal_weight_lb, activity: d.activity as Activity,
-      goal: d.goal as Goal, diet: d.diet as Diet, gym_when: d.gym_when as GymWhen,
-      gym_days: d.gym_when === "none" ? 0 : Number(d.gym_days),
+      goal: d.goal as Goal, diet: d.diet as Diet,
+      splits: d.splits, gym_time: d.gym_time, likes: d.likes,
+      // Derived, so nobody has to answer the same thing twice.
+      gym_days: trainingCount,
+      gym_when: trainingCount === 0 ? "none"
+        : Number(d.gym_time.split(":")[0]) < 12 ? "morning" : "evening",
       cuisine: d.cuisine,
       target_weeks: d.months === "" ? 24 : monthsToWeeks(Number(d.months)),
       units: d.units, meals_per_day: d.meals_per_day,
@@ -271,23 +325,50 @@ export default function Setup({ initial }: { initial: Profile | null }) {
       </div>
 
       <div className="grp">
-        <div className="grptitle">Training</div>
-        <div className="grpsub">When you train decides when your meals land.</div>
-
-        <div className="field">
-          <span className="fieldlabel">Gym time</span>
-          <Seg<GymWhen> value={d.gym_when} onChange={(v) => set("gym_when", v)} options={[
-            { v: "morning", label: "Mornings" },
-            { v: "evening", label: "Evenings" },
-            { v: "none", label: "Not training" },
-          ]} />
+        <div className="grptitle">Your training week</div>
+        <div className="grpsub">
+          Set what you do each day. Rest days get a lighter plan and no gym meals.
         </div>
 
-        {d.gym_when !== "none" && (
+        <div className="field">
+          <span className="fieldlabel">Start from</span>
+          <div className="avoid">
+            {PRESETS.map((pre) => (
+              <button key={pre.label} type="button"
+                      onClick={() => set("splits", { ...pre.splits })}>
+                {pre.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="field">
+          <div className="week">
+            {DAY_KEYS.map((k) => (
+              <label className="weekrow" key={k}>
+                <span className="wd">{DAY_LABEL[k].slice(0, 3)}</span>
+                <select
+                  value={d.splits[k]}
+                  aria-label={`What you train on ${DAY_LABEL[k]}`}
+                  onChange={(e) => set("splits", { ...d.splits, [k]: e.target.value as Split })}
+                >
+                  {SPLIT_OPTIONS.map((sp) => (
+                    <option key={sp} value={sp}>{SPLIT_LABEL[sp]}</option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {DAY_KEYS.some((k) => d.splits[k] !== "rest") && (
           <div className="field">
-            <span className="fieldlabel">Days a week</span>
-            <Seg<number> value={d.gym_days} onChange={(v) => set("gym_days", v)}
-              options={[2, 3, 4, 5, 6].map((n) => ({ v: n, label: String(n) }))} />
+            <label htmlFor="gymtime">What time do you train?</label>
+            <input id="gymtime" type="time" value={d.gym_time}
+                   onChange={(e) => set("gym_time", e.target.value || "19:00")} />
+            <p className="grpsub" style={{ margin: "6px 0 0" }}>
+              Your pre-workout and post-gym meals land around this, and dinner after it.
+            </p>
           </div>
         )}
 
@@ -338,6 +419,24 @@ export default function Setup({ initial }: { initial: Profile | null }) {
           <Seg<boolean> value={d.uses_supplements} onChange={(v) => set("uses_supplements", v)}
             options={[{ v: true, label: "I use them" }, { v: false, label: "Food only" }]} />
         </div>
+
+        {LIKE_GROUPS.map((g) => (
+          <div className="field" key={g.title}>
+            <span className="fieldlabel">{g.title}</span>
+            {g.hint && <p className="grpsub" style={{ margin: "-2px 0 8px" }}>{g.hint}</p>}
+            <div className="avoid">
+              {g.options.map((o) => {
+                const on = d.likes.includes(o.v);
+                return (
+                  <button key={o.v} type="button" aria-pressed={on} className={on ? "liked" : ""}
+                    onClick={() => set("likes", on ? d.likes.filter((x) => x !== o.v) : [...d.likes, o.v])}>
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         <div className="field">
           <span className="fieldlabel">Keep out of my plan</span>

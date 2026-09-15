@@ -29,3 +29,10 @@ alter table public.profiles enable row level security;
 drop policy if exists "own profile" on public.profiles;
 create policy "own profile" on public.profiles
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Added later: per-day training splits, preferred gym time, and dish preferences.
+alter table public.profiles
+  add column if not exists splits    jsonb  not null default
+    '{"mon":"chest_back","tue":"arms","wed":"legs","thu":"shoulders","fri":"full_body","sat":"rest","sun":"rest"}'::jsonb,
+  add column if not exists gym_time  text   not null default '19:00',
+  add column if not exists likes     text[] not null default '{}';

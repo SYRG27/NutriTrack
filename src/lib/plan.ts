@@ -1,11 +1,11 @@
 import type { PlanDay, PlanItem, PlanSlot, FoodTag } from "./types";
-import type { Avoid, Diet, GymWhen, Profile } from "./profile";
-import { targetsFor } from "./profile";
+import type { Avoid, Diet, Like, Profile } from "./profile";
+import { SPLIT_LABEL, isTrainingDay, splitFor, targetsFor } from "./profile";
 
 /* ---------------------------------------------------------------------------
-   The base menu: South Indian, non-vegetarian, written around an evening gym.
-   Every portion carries its own per-unit calories, so the same menu can be
-   scaled to anyone's target and swapped to any diet.
+   Pools of Telugu home cooking. A person's plan is assembled from the ones
+   they said they would actually eat, rotated so the week is not the same day
+   seven times, and sized to their own target.
 --------------------------------------------------------------------------- */
 
 const I = (
@@ -13,13 +13,70 @@ const I = (
   tag: FoodTag = "veg", extra: Partial<PlanItem> = {},
 ): PlanItem => ({ n, q, u, k, p, e, tag, ...extra });
 
-const CHICKEN = (g: number) => I("Chicken curry", g, "g", 2.0, 0.25, "🍗", "meat");
-const FISH    = (g: number) => I("Fish curry", g, "g", 1.67, 0.21, "🐟", "fish");
-const RICE    = (q: number) => I("Rice + quinoa", q, "cup", 215, 6, "🍚");
-const CURD    = () => I("Curd", 1, "cup", 100, 6, "🥛", "dairy");
-const BUTTERMILK = () => I("Buttermilk", 1, "glass", 60, 3, "🥛", "dairy", { fixed: true });
-const BANANA  = () => I("Banana", 1, "banana", 105, 1, "🍌", "veg", { fixed: true });
-const TRAILMIX = () => I("Trail mix pack", 1, "pack", 140, 4, "🥜", "veg", { fixed: true });
+type Choice = { key: Like; items: PlanItem[] };
+
+const BREAKFASTS: Choice[] = [
+  { key: "idli", items: [I("Idli", 3, "idli", 70, 2, "🍚"), I("Sambar", 1, "cup", 120, 6, "🥣")] },
+  { key: "dosa", items: [I("Dosa", 2, "dosa", 150, 3, "🫓"), I("Coconut chutney", 1, "serving", 90, 2, "🥥", "veg", { fixed: true })] },
+  { key: "pesarattu", items: [I("Pesarattu", 2, "pesarattu", 150, 6, "🫓"), I("Ginger chutney", 1, "serving", 60, 1, "🌶️", "veg", { fixed: true })] },
+  { key: "upma", items: [I("Upma", 1.5, "cup", 220, 5, "🥣")] },
+  { key: "poha", items: [I("Poha", 1.5, "cup", 200, 4, "🥣"), I("Peanuts", 20, "g", 5.67, 0.26, "🥜")] },
+  { key: "curd_rice", items: [I("Curd rice", 1, "bowl", 250, 7, "🍚", "dairy")] },
+  { key: "idiyappam", items: [I("Idiyappam", 3, "idiyappam", 95, 2, "🍜"), I("Coconut chutney", 1, "serving", 90, 2, "🥥", "veg", { fixed: true })] },
+  { key: "oats", items: [I("Oats", 1, "cup", 160, 6, "🥣"), I("Banana", 1, "banana", 105, 1, "🍌", "veg", { fixed: true })] },
+  { key: "eggs", items: [I("Omelette", 3, "egg", 95, 7, "🍳", "egg")] },
+  { key: "paratha", items: [I("Aloo paratha", 1, "paratha", 330, 7, "🫓"), I("Curd", 1, "cup", 100, 6, "🥛", "dairy")] },
+];
+
+/** The protein that anchors lunch and dinner. */
+const MAINS: { key: Like; lunch: PlanItem; dinner: PlanItem }[] = [
+  { key: "chicken",
+    lunch:  I("Chicken curry", 180, "g", 2.0, 0.25, "🍗", "meat"),
+    dinner: I("Chicken tikka", 150, "g", 1.87, 0.27, "🍗", "meat") },
+  { key: "fish",
+    lunch:  I("Fish curry", 180, "g", 1.67, 0.21, "🐟", "fish"),
+    dinner: I("Fish fry", 150, "g", 1.8, 0.22, "🐟", "fish") },
+  { key: "prawns",
+    lunch:  I("Prawn curry", 180, "g", 1.45, 0.21, "🦐", "fish"),
+    dinner: I("Grilled shrimp", 150, "g", 1.67, 0.22, "🦐", "fish") },
+  { key: "goat",
+    lunch:  I("Goat curry", 130, "g", 2.75, 0.23, "🍛", "meat"),
+    dinner: I("Mutton keema", 120, "g", 2.6, 0.24, "🍛", "meat") },
+  { key: "egg_curry",
+    lunch:  I("Egg curry", 3, "egg", 110, 7, "🍛", "egg"),
+    dinner: I("Egg bhurji", 3, "egg", 115, 7, "🍳", "egg") },
+  { key: "paneer",
+    lunch:  I("Paneer curry", 1, "cup", 320, 16, "🧀", "dairy"),
+    dinner: I("Paneer, air fried", 120, "g", 2.9, 0.2, "🧀", "dairy") },
+  { key: "tofu",
+    lunch:  I("Tofu curry", 1, "cup", 250, 18, "🧈"),
+    dinner: I("Tofu, air fried", 150, "g", 1.9, 0.22, "🧈") },
+  { key: "soya",
+    lunch:  I("Soya chunks curry", 1, "cup", 250, 25, "🫘"),
+    dinner: I("Soya chunks curry", 1, "cup", 250, 25, "🫘") },
+  { key: "dal",
+    lunch:  I("Dal", 1.5, "katori", 140, 8, "🫘"),
+    dinner: I("Dal", 1.5, "katori", 140, 8, "🫘") },
+];
+
+const SIDES: PlanItem[] = [
+  I("Beans poriyal", 1, "serving", 80, 3, "🥬"),
+  I("Cabbage fry", 1, "serving", 85, 3, "🥬"),
+  I("Beetroot poriyal", 1, "serving", 90, 3, "🥬"),
+  I("Gutti vankaya", 1, "serving", 190, 4, "🍆"),
+  I("Bendakaya vepudu", 1, "serving", 160, 3, "🥬"),
+  I("Avial", 1, "cup", 120, 3, "🥥"),
+  I("Thotakura fry", 1, "serving", 110, 4, "🥬"),
+];
+
+const SNACKS: Choice[] = [
+  { key: "fruit", items: [I("Banana", 1, "banana", 105, 1, "🍌", "veg", { fixed: true })] },
+  { key: "fruit", items: [I("Apple", 1, "apple", 95, 0.5, "🍎", "veg", { fixed: true })] },
+  { key: "nuts", items: [I("Trail mix pack", 1, "pack", 140, 4, "🥜", "veg", { fixed: true })] },
+  { key: "sprouts", items: [I("Sprouts salad", 1, "cup", 120, 8, "🥗")] },
+  { key: "yogurt", items: [I("Greek yogurt", 1, "cup", 145, 25, "🥛", "dairy")] },
+  { key: "chana", items: [I("Roasted chana", 30, "g", 4.0, 0.23, "🥜")] },
+];
 
 const POST_GYM = (): PlanItem[] => [
   I("Whey shake", 1, "scoop", 120, 24, "🥤", "dairy", { fixed: true }),
@@ -27,180 +84,10 @@ const POST_GYM = (): PlanItem[] => [
   I("Boiled egg whites", 4, "white", 17, 3.5, "🥚", "egg", { fixed: true, alt: true }),
 ];
 
-const SNACK = (first: PlanItem): PlanSlot => ({
-  id: "s", time: "16:30", name: "Evening snack", tone: "plum",
-  items: [first, TRAILMIX()],
-});
-
-const PRE = (): PlanSlot => ({
-  id: "pre", time: "18:00", name: "Pre-workout", tone: "indigo", items: [BANANA()],
-});
-
-const PG = (): PlanSlot => ({
-  id: "pg", time: "20:45", name: "Post-gym", tone: "leaf", items: POST_GYM(),
-});
-
-export const BASE_PLAN: Record<number, PlanDay> = {
-  1: {
-    label: "Monday", focus: "Chest + Back", gym: { from: "19:00", to: "20:30" },
-    slots: [
-      { id: "b", time: "07:30", name: "Breakfast", tone: "turmeric", items: [
-        I("Idli", 2, "idli", 70, 2, "🍚"),
-        I("Sambar", 1, "cup", 120, 6, "🥣"),
-        I("Omelette", 2, "egg", 95, 7, "🍳", "egg"),
-      ]},
-      { id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
-        RICE(1), CHICKEN(180),
-        I("Dal", 1, "katori", 140, 8, "🫘"),
-        I("Beans poriyal", 1, "serving", 80, 3, "🥬"),
-        CURD(),
-      ]},
-      SNACK(BANANA()), PRE(), PG(),
-      { id: "d", time: "21:15", name: "Dinner", tone: "indigo", items: [
-        I("Grilled fish", 150, "g", 1.67, 0.22, "🐟", "fish"),
-        I("Sautéed vegetables", 1, "serving", 90, 3, "🥦"),
-        RICE(0.5), BUTTERMILK(),
-      ]},
-    ],
-  },
-  2: {
-    label: "Tuesday", focus: "Biceps + Triceps", gym: { from: "19:00", to: "20:30" },
-    slots: [
-      { id: "b", time: "07:30", name: "Breakfast", tone: "turmeric", items: [
-        I("Pesarattu", 2, "pesarattu", 150, 6, "🫓"),
-        I("Ginger chutney", 1, "serving", 60, 1, "🌶️", "veg", { fixed: true }),
-        I("Boiled eggs", 2, "egg", 70, 6, "🥚", "egg"),
-      ]},
-      { id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
-        RICE(1), FISH(180),
-        I("Rasam", 1, "cup", 60, 2, "🍲", "veg", { fixed: true }),
-        I("Cabbage fry", 1, "serving", 85, 3, "🥬"),
-        CURD(),
-      ]},
-      SNACK(I("Apple", 1, "apple", 95, 0.5, "🍎", "veg", { fixed: true })), PRE(), PG(),
-      { id: "d", time: "21:15", name: "Dinner", tone: "indigo", items: [
-        I("Chicken tikka", 150, "g", 1.87, 0.27, "🍗", "meat"),
-        I("Kachumber salad", 1, "serving", 60, 2, "🥗", "veg", { fixed: true }),
-        I("Phulka", 2, "phulka", 70, 3, "🫓"),
-        BUTTERMILK(),
-      ]},
-    ],
-  },
-  3: {
-    label: "Wednesday", focus: "Legs + Abs", gym: { from: "19:00", to: "20:30" },
-    slots: [
-      { id: "b", time: "07:30", name: "Breakfast", tone: "turmeric", items: [
-        I("Upma", 1.5, "cup", 220, 5, "🥣"),
-        I("Boiled eggs", 2, "egg", 70, 6, "🥚", "egg"),
-      ]},
-      { id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
-        RICE(1),
-        I("Egg curry", 3, "egg", 110, 7, "🍛", "egg"),
-        I("Dal", 1, "katori", 140, 8, "🫘"),
-        I("Beetroot poriyal", 1, "serving", 90, 3, "🥬"),
-        CURD(),
-      ]},
-      SNACK(I("Sprouts salad", 1, "cup", 120, 8, "🥗")), PRE(), PG(),
-      { id: "d", time: "21:15", name: "Dinner", tone: "indigo", items: [
-        I("Shrimp stir fry", 180, "g", 1.44, 0.21, "🦐", "fish"),
-        I("Sautéed vegetables", 1, "serving", 90, 3, "🥦"),
-        I("Phulka", 1, "phulka", 70, 3, "🫓"),
-        BUTTERMILK(),
-      ]},
-    ],
-  },
-  4: {
-    label: "Thursday", focus: "Shoulders + Back", gym: { from: "19:00", to: "20:30" },
-    slots: [
-      { id: "b", time: "07:30", name: "Breakfast", tone: "turmeric", items: [
-        I("Curd rice", 1, "bowl", 250, 7, "🍚", "dairy"),
-        I("Boiled eggs", 2, "egg", 70, 6, "🥚", "egg"),
-      ]},
-      { id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
-        RICE(1), CHICKEN(180),
-        I("Gutti vankaya", 1, "serving", 190, 4, "🍆"),
-        I("Rasam", 1, "cup", 60, 2, "🍲", "veg", { fixed: true }),
-        CURD(),
-      ]},
-      SNACK(I("Apple", 1, "apple", 95, 0.5, "🍎", "veg", { fixed: true })), PRE(), PG(),
-      { id: "d", time: "21:15", name: "Dinner", tone: "indigo", items: [
-        I("Fish fry", 150, "g", 1.8, 0.22, "🐟", "fish"),
-        I("Kachumber salad", 1, "serving", 60, 2, "🥗", "veg", { fixed: true }),
-        I("Phulka", 2, "phulka", 70, 3, "🫓"),
-        BUTTERMILK(),
-      ]},
-    ],
-  },
-  5: {
-    label: "Friday", focus: "Full body + cardio", gym: { from: "19:00", to: "20:30" },
-    slots: [
-      { id: "b", time: "07:30", name: "Breakfast", tone: "turmeric", items: [
-        I("Dosa", 1, "dosa", 150, 3, "🫓"),
-        I("Omelette", 3, "egg", 95, 7, "🍳", "egg"),
-      ]},
-      { id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
-        RICE(1), FISH(180),
-        I("Dal", 1, "katori", 140, 8, "🫘"),
-        I("Beans poriyal", 1, "serving", 80, 3, "🥬"),
-        CURD(),
-      ]},
-      SNACK(BANANA()), PRE(), PG(),
-      { id: "d", time: "21:15", name: "Dinner", tone: "indigo", items: [
-        CHICKEN(150),
-        I("Phulka", 2, "phulka", 70, 3, "🫓"),
-        I("Sautéed vegetables", 1, "serving", 90, 3, "🥦"),
-        BUTTERMILK(),
-      ]},
-    ],
-  },
-  6: {
-    label: "Saturday", focus: "Rest day", gym: null,
-    slots: [
-      { id: "b", time: "08:30", name: "Breakfast", tone: "turmeric", items: [
-        I("Rava dosa", 2, "dosa", 160, 3.5, "🫓"),
-        I("Coconut chutney", 1, "serving", 90, 2, "🥥", "veg", { fixed: true }),
-        I("Boiled eggs", 2, "egg", 70, 6, "🥚", "egg"),
-      ]},
-      { id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
-        RICE(1),
-        I("Goat curry", 120, "g", 2.75, 0.23, "🍛", "meat"),
-        I("Rasam", 1, "cup", 60, 2, "🍲", "veg", { fixed: true }),
-        I("Veg fry", 1, "serving", 90, 3, "🥬"),
-        CURD(),
-      ]},
-      SNACK(I("Fruit bowl", 1, "bowl", 120, 2, "🍉")),
-      { id: "d", time: "20:00", name: "Dinner", tone: "indigo", items: [
-        I("Fish fry", 150, "g", 1.8, 0.22, "🐟", "fish"),
-        I("Kachumber salad", 1, "serving", 60, 2, "🥗", "veg", { fixed: true }),
-        I("Phulka", 1, "phulka", 70, 3, "🫓"),
-        BUTTERMILK(),
-      ]},
-    ],
-  },
-  0: {
-    label: "Sunday", focus: "Optional gym", gym: { from: "19:00", to: "20:30" },
-    slots: [
-      { id: "b", time: "08:30", name: "Breakfast", tone: "turmeric", items: [
-        I("Idiyappam", 3, "idiyappam", 95, 2, "🍜"),
-        I("Egg curry", 2, "egg", 110, 7, "🍛", "egg"),
-      ]},
-      { id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
-        RICE(1),
-        I("Chicken pepper fry", 150, "g", 2.0, 0.25, "🍗", "meat"),
-        I("Dal", 1, "katori", 140, 8, "🫘"),
-        I("Avial", 1, "cup", 120, 3, "🥥"),
-        CURD(),
-      ]},
-      SNACK(BANANA()), PRE(), PG(),
-      { id: "d", time: "20:30", name: "Dinner", tone: "indigo", items: [
-        I("Grilled shrimp", 150, "g", 1.67, 0.22, "🦐", "fish"),
-        I("Sautéed vegetables", 1, "serving", 90, 3, "🥦"),
-        I("Phulka", 1, "phulka", 70, 3, "🫓"),
-        BUTTERMILK(),
-      ]},
-    ],
-  },
-};
+const RICE = (q: number) => I("Rice + quinoa", q, "cup", 215, 6, "🍚");
+const CURD = () => I("Curd", 1, "cup", 100, 6, "🥛", "dairy");
+const BUTTERMILK = () => I("Buttermilk", 1, "glass", 60, 3, "🥛", "dairy", { fixed: true });
+const BANANA = () => I("Banana", 1, "banana", 105, 1, "🍌", "veg", { fixed: true });
 
 /* ---------------------------------------------------------------------------
    Diet swaps. A replacement keeps roughly the calories and protein of what it
@@ -328,11 +215,14 @@ const BANNED: Record<Diet, FoodTag[]> = {
 
 /* --------------------------- portion scaling --------------------------- */
 
+/* Things you can serve a quarter of, versus things you count. Nobody puts
+   one and a half eggs on a plate. */
+const DIVISIBLE = ["cup", "katori", "glass", "serving", "bowl", "plate", "tbsp", "2 tbsp", "tsp"];
+
 const roundQty = (q: number, unit: string) => {
   if (unit === "g") return Math.max(25, Math.round(q / 25) * 25);
-  const countable = !["cup", "katori", "glass", "serving", "bowl", "scoop", "pack"].includes(unit);
-  const step = countable ? 0.5 : 0.25;
-  return Math.max(step, Math.round(q / step) * step);
+  if (DIVISIBLE.includes(unit)) return Math.max(0.25, Math.round(q * 4) / 4);
+  return Math.max(1, Math.round(q));
 };
 
 export const itemKcal = (i: PlanItem) => i.q * i.k;
@@ -454,92 +344,150 @@ export function proteinShortfall(
   return { average: Math.round(avg), short: avg < target.protein * 0.9 };
 }
 
-/* ----------------------- gym timing rearrangement ----------------------- */
+/* ------------------------------ meal times ------------------------------ */
 
-const GYM_HOURS: Record<Exclude<GymWhen, "none">, { from: string; to: string }> = {
-  morning: { from: "08:00", to: "09:00" },
-  evening: { from: "19:00", to: "20:30" },
+const toMin = (t: string) => {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+};
+const toHM = (mins: number) => {
+  const m = ((mins % 1440) + 1440) % 1440;
+  return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 };
 
-function retime(day: PlanDay, gym: GymWhen): PlanDay {
-  if (gym === "evening") return day;
-
-  if (gym === "none") {
-    // No gym: the pre-workout and post-gym slots have nothing to bracket.
-    const slots = day.slots
-      .filter((s) => s.id !== "pre" && s.id !== "pg")
-      .map((s) => (s.id === "d" ? { ...s, time: "20:00" } : s));
-    return { ...day, gym: null, slots };
-  }
-
-  // Morning gym: train first, then breakfast becomes the post-gym meal.
-  const breakfast = day.slots.find((s) => s.id === "b");
-  const post = day.slots.find((s) => s.id === "pg");
-  const slots: PlanSlot[] = [];
-
-  slots.push({ id: "pre", time: "07:15", name: "Pre-workout", tone: "indigo",
-    items: [I("Banana", 1, "banana", 105, 1, "🍌", "veg", { fixed: true })] });
-
-  slots.push({
-    id: "pg", time: "09:15", name: "Post-gym breakfast", tone: "turmeric",
-    items: [...(post?.items ?? []).slice(0, 1), ...(breakfast?.items ?? [])],
-  });
-
-  day.slots.forEach((s) => {
-    if (s.id === "b" || s.id === "pre" || s.id === "pg") return;
-    slots.push(s.id === "d" ? { ...s, time: "20:00" } : s);
-  });
-
-  return { ...day, gym: GYM_HOURS.morning, slots };
-}
+const GYM_LENGTH = 90;
 
 /* ------------------------------ the builder ------------------------------ */
 
+const allowed = (item: PlanItem, banned: FoodTag[]) => !banned.includes(item.tag);
+
+/** Their picks if they made any, otherwise everything the diet allows. */
+function pool<T>(all: T[], keyOf: (x: T) => Like, likes: Like[], ok: (x: T) => boolean) {
+  const usable = all.filter(ok);
+  const liked = usable.filter((x) => likes.includes(keyOf(x)));
+  return liked.length ? liked : usable;
+}
+
 /**
- * Turn the base menu into this person's plan: their cuisine, their diet,
- * their gym timing, and portions scaled to the calories their profile works
- * out to. Nothing here touches the food catalogue — they can still log
- * anything they like on top.
+ * Build one person's week. Training days get a pre-workout and a post-gym
+ * meal around whatever time they train; rest days get neither and eat a
+ * little lighter, so the week averages out to their target rather than every
+ * day being identical.
  */
 export function buildPlan(profile: Profile): Record<number, PlanDay> {
   const target = targetsFor(profile);
   const banned = BANNED[profile.diet];
+  const likes = profile.likes ?? [];
   const out: Record<number, PlanDay> = {};
 
-  for (const key of [0, 1, 2, 3, 4, 5, 6]) {
-    let day = BASE_PLAN[key];
+  const breakfasts = pool(BREAKFASTS, (b) => b.key, likes,
+    (b) => b.items.every((i) => allowed(i, banned)));
+  const mains = pool(MAINS, (m) => m.key, likes,
+    (m) => allowed(m.lunch, banned) && allowed(m.dinner, banned));
+  const snacks = pool(SNACKS, (s) => s.key, likes,
+    (s) => s.items.every((i) => allowed(i, banned)));
 
-    day = {
-      ...day,
-      slots: day.slots.map((slot) => ({
+  const gymStart = toMin(profile.gym_time || "19:00");
+  const morning = gymStart < 12 * 60;
+
+  for (let day = 0; day < 7; day++) {
+    const training = isTrainingDay(profile, day);
+    const split = splitFor(profile, day);
+
+    const bfast = breakfasts[day % breakfasts.length].items.map((i) => ({ ...i }));
+    const main = mains[day % mains.length];
+    const main2 = mains[(day + Math.max(1, Math.floor(mains.length / 2))) % mains.length];
+    const side = SIDES[day % SIDES.length];
+    const snack = snacks[day % snacks.length].items.map((i) => ({ ...i }));
+
+    // Eggs go with any breakfast for someone who eats them.
+    if (likes.includes("eggs") && !banned.includes("egg") &&
+        !bfast.some((i) => i.tag === "egg"))
+      bfast.push(I("Boiled eggs", 2, "egg", 70, 6, "🥚", "egg"));
+
+    const slots: PlanSlot[] = [];
+    const bTime = training && morning ? toHM(gymStart + GYM_LENGTH + 15) : training ? "07:30" : "08:30";
+
+    if (training && morning) {
+      slots.push({ id: "pre", time: toHM(gymStart - 45), name: "Pre-workout", tone: "indigo",
+        items: [BANANA()] });
+      slots.push({ id: "pg", time: bTime, name: "Post-gym breakfast", tone: "turmeric",
+        items: [POST_GYM()[0], ...bfast] });
+    } else {
+      slots.push({ id: "b", time: bTime, name: "Breakfast", tone: "turmeric", items: bfast });
+    }
+
+    slots.push({ id: "l", time: "13:00", name: "Lunch", tone: "leaf", items: [
+      RICE(1), { ...main.lunch },
+      ...(main.key === "dal" ? [] : [I("Dal", 1, "katori", 140, 8, "🫘")]),
+      { ...side }, CURD(),
+    ]});
+
+    if (profile.meals_per_day >= 5)
+      slots.push({ id: "s", time: "16:30", name: "Evening snack", tone: "plum", items: snack });
+
+    if (training && !morning) {
+      if (profile.meals_per_day >= 4)
+        slots.push({ id: "pre", time: toHM(gymStart - 60), name: "Pre-workout", tone: "indigo",
+          items: [BANANA()] });
+      slots.push({ id: "pg", time: toHM(gymStart + GYM_LENGTH + 15), name: "Post-gym",
+        tone: "leaf", items: POST_GYM() });
+    }
+
+    const dinnerTime = training && !morning ? toHM(gymStart + GYM_LENGTH + 45) : "20:00";
+    slots.push({ id: "d", time: dinnerTime, name: training ? "Dinner" : "Dinner, light",
+      tone: "indigo", items: training
+        ? [{ ...main2.dinner }, I("Sautéed vegetables", 1, "serving", 90, 3, "🥦"),
+           I("Phulka", 2, "phulka", 70, 3, "🫓"), BUTTERMILK()]
+        // Rest day: no rice, no roti stack — the protein, vegetables and that is it.
+        : [{ ...main2.dinner }, I("Sautéed vegetables", 1, "serving", 90, 3, "🥦"),
+           I("Kachumber salad", 1, "serving", 60, 2, "🥗", "veg", { fixed: true }), BUTTERMILK()],
+    });
+
+    let dayPlan: PlanDay = {
+      label: DAY_NAMES[day],
+      focus: training ? SPLIT_LABEL[split] : "Rest day",
+      gym: training ? { from: toHM(gymStart), to: toHM(gymStart + GYM_LENGTH) } : null,
+      slots,
+    };
+
+    // Diet, allergy and supplement swaps.
+    dayPlan = {
+      ...dayPlan,
+      slots: dayPlan.slots.map((slot) => ({
         ...slot,
         items: slot.items.map((raw) => {
           let item = raw;
-          if (profile.cuisine === "north") item = applySwaps(item, NORTH_FOR_SOUTH);
           if (banned.includes(item.tag)) item = applySwaps(item, VEG_FOR_MEAT);
           if (banned.includes(item.tag)) item = applySwaps(item, VEGAN_FOR_DAIRY_EGG);
           if (banned.includes(item.tag)) item = applySwaps(item, VEGAN_FOR_DAIRY_EGG);
-          profile.avoid.forEach((a) => { item = applySwaps(item, AVOID_SWAPS[a]); });
+          (profile.avoid ?? []).forEach((a) => { item = applySwaps(item, AVOID_SWAPS[a]); });
           if (!profile.uses_supplements) item = applySwaps(item, NO_SUPPLEMENT);
           return item;
         }),
       })),
     };
 
-    // Fewer meals: fold the snack, and the pre-workout, back into the big ones.
-    // This happens BEFORE scaling, or dropping a slot would drop its calories too.
-    if (profile.meals_per_day <= 4) day = { ...day, slots: day.slots.filter((s) => s.id !== "s") };
-    if (profile.meals_per_day <= 3) day = { ...day, slots: day.slots.filter((s) => s.id !== "pre") };
+    /* Training days earn a little more, rest days a little less. Averaged over
+       the week this still lands on their target. */
+    const trainingCount = [0, 1, 2, 3, 4, 5, 6].filter((d) => isTrainingDay(profile, d)).length;
+    const dayTarget = {
+      ...target,
+      kcal: Math.round(
+        trainingCount === 0 || trainingCount === 7
+          ? target.kcal
+          : training
+            ? target.kcal * (1 + 0.08 * (7 - trainingCount) / 7)
+            : target.kcal * (1 - 0.08 * trainingCount / 7),
+      ),
+    };
 
-    const f = factors(day, target);
-    day = { ...day, slots: day.slots.map((s) => ({ ...s, items: scaleItems(s.items, f) })) };
-    day = settle(day, target);
-
-    out[key] = retime(day, profile.gym_when);
+    const f = factors(dayPlan, dayTarget);
+    dayPlan = { ...dayPlan, slots: dayPlan.slots.map((s) => ({ ...s, items: scaleItems(s.items, f) })) };
+    out[day] = settle(dayPlan, dayTarget);
   }
 
   return out;
 }
 
-/** The author's own plan, for anyone who has not filled in a profile yet. */
-export const PLAN = BASE_PLAN;
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
