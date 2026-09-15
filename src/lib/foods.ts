@@ -887,7 +887,62 @@ export const FOODS: Food[] = [
  F("Bread omelette","🥪","plate",400,22,0,"restaurant breakfast"),
  F("Egg bhurji with pav","🍳","plate",480,22,0,"restaurant breakfast"),
  F("Bun butter jam","🍞","serving",320,6,0,"restaurant breakfast cafe"),
- F("Indian breakfast buffet plate","🍽️","plate",900,25,0,"restaurant hotel")
+ F("Indian breakfast buffet plate","🍽️","plate",900,25,0,"restaurant hotel"),
+
+ /* --- bagels, plain and from the counter --- */
+ F("Plain bagel","🥯","bagel",280,10,0,"einstein bros panera"),
+ F("Everything bagel","🥯","bagel",290,11,0,"einstein bros"),
+ F("Asiago cheese bagel","🥯","bagel",330,13,0,"einstein bros"),
+ F("Cinnamon raisin bagel","🥯","bagel",300,10,0,"einstein bros"),
+ F("Blueberry bagel","🥯","bagel",300,10,0,"einstein bros"),
+ F("Whole wheat bagel","🥯","bagel",270,11,0,"einstein bros"),
+ F("Bagel thin","🥯","bagel",140,6,0,"einstein bros"),
+ F("Cream cheese schmear","🧀","2 tbsp",100,2,0,"einstein bros bagel"),
+ F("Smoked salmon","🐟","oz",35,6,0,"lox bagel nova"),
+ F("Bacon egg and cheese bagel","🥯","sandwich",560,26,0,"einstein bros breakfast"),
+ F("Egg and cheese bagel sandwich","🥯","sandwich",480,22,0,"einstein bros breakfast"),
+ F("Nova lox bagel","🥯","sandwich",490,23,0,"einstein bros smoked salmon"),
+ F("Avocado veg bagel sandwich","🥯","sandwich",480,16,0,"einstein bros"),
+ F("Brisket bagel sandwich","🥯","sandwich",700,35,0,"einstein bros texas"),
+
+ /* --- IHOP and the diner breakfast --- */
+ F("Buttermilk pancakes, 4","🥞","stack",590,16,0,"ihop original no syrup"),
+ F("Pancake short stack, 2","🥞","stack",300,8,0,"ihop"),
+ F("Chocolate chip pancakes, 4","🥞","stack",830,17,0,"ihop"),
+ F("Belgian waffle","🧇","waffle",590,12,0,"ihop"),
+ F("French toast, 4 slices","🍞","serving",760,20,0,"ihop"),
+ F("French toast, 2 slices","🍞","serving",350,10,0,"diner"),
+ F("IHOP 2x2x2 breakfast","🍳","plate",690,25,0,"pancakes eggs bacon"),
+ F("Big steak omelette","🍳","omelette",1100,60,0,"ihop"),
+ F("Colorado omelette","🍳","omelette",1000,55,0,"ihop"),
+ F("Breakfast sampler platter","🍳","plate",1200,50,0,"ihop dennys grand slam"),
+ F("Grand Slam breakfast","🍳","plate",800,35,0,"dennys"),
+ F("Old Timer's breakfast","🍳","plate",900,40,0,"cracker barrel"),
+ F("Sirloin tips and eggs","🥩","plate",800,60,0,"ihop steak"),
+ F("Chicken and waffles","🧇","plate",950,45,0,"american"),
+ F("Eggs Benedict","🍳","plate",850,35,0,"american brunch"),
+ F("Biscuits and gravy","🥖","plate",700,15,0,"american southern"),
+ F("Country fried steak and eggs","🥩","plate",1100,45,0,"american southern"),
+ F("Corned beef hash","🥩","serving",350,20,0,"american diner"),
+
+ /* --- the pieces of an American breakfast --- */
+ F("Cheese omelette, 3 eggs","🍳","omelette",400,25,0,"american"),
+ F("Egg white omelette","🍳","omelette",220,25,0,"american"),
+ F("Breakfast sandwich, egg and cheese","🥪","sandwich",320,16,0,"english muffin"),
+ F("Breakfast quesadilla","🫓","quesadilla",600,28,0,"american"),
+ F("Sausage links, 2","🥓","serving",170,8,0,"american breakfast"),
+ F("Ham slice","🍖","slice",60,9,0,"american breakfast"),
+ F("Home fries","🥔","serving",300,4,0,"american breakfast"),
+ F("Grits","🥣","cup",180,4,0,"american southern breakfast"),
+ F("Cereal with milk","🥣","bowl",250,10,0,"american breakfast"),
+ F("Granola with yogurt","🥣","cup",400,14,0,"american breakfast parfait"),
+ F("Toast with butter, 2","🍞","serving",200,5,0,"american breakfast"),
+ F("English muffin","🥯","muffin",130,5,0,"american breakfast"),
+ F("Buttermilk biscuit","🥖","biscuit",200,4,0,"american southern"),
+ F("Danish pastry","🥐","pastry",350,5,0,"american breakfast"),
+ F("Protein waffles","🧇","serving",350,25,0,"american breakfast"),
+ F("Maple syrup","🍯","2 tbsp",110,0,0,"pancakes waffles"),
+ F("Whipped butter","🧈","tbsp",70,0,0,"pancakes toast")
 
 
 
