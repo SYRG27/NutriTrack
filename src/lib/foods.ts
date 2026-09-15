@@ -400,7 +400,17 @@ export const FOODS: Food[] = [
  F("Rice, raw (basmati)","🍚","g",350,8,1,"uncooked dry"),
  F("Rice + quinoa (cooked)","🍚","cup",215,6,0,"half and half mix standard annam"),
  F("Quinoa (cooked)","🍚","cup",222,8,0),
- F("Quinoa, raw (uncooked)","🍚","g",368,14,1,"dry before cooking")
+ F("Quinoa, raw (uncooked)","🍚","g",368,14,1,"dry before cooking"),
+
+ /* ===== Tofu and paneer ===== */
+ F("Tofu, air fried","🧈","g",190,22,1,"crispy firm cubes airfryer"),
+ F("Tofu, firm (raw)","🧈","g",144,17,1,"block uncooked"),
+ F("Tofu, silken","🧈","g",55,5,1,"soft"),
+ F("Tofu curry","🧈","cup",250,18,0,"gravy"),
+ F("Tofu scramble","🍳","cup",220,20,0,"bhurji"),
+ F("Paneer, air fried","🧀","g",290,20,1,"grilled cubes airfryer tikka no gravy"),
+ F("Paneer bhurji","🧀","cup",300,18,0,"scrambled"),
+ F("Soya chunks, dry","🫘","g",345,52,1,"meal maker nutrela uncooked")
 
 
 
