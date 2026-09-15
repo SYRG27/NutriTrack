@@ -46,7 +46,12 @@ export default function NutriTrack({
   const [qty, setQty] = useState(1);
   const [when, setWhen] = useState("");
   const [thinking, setThinking] = useState(false);
-  const [drafts, setDrafts] = useState<Record<string, { time: string; qty: number }>>({});
+  const [drafts, setDrafts] = useState<
+    Record<string, { time: string; qty: number; k: number; p: number }>
+  >({});
+  // The catalogue's numbers are a starting point; a bar on your counter may differ.
+  const [pickK, setPickK] = useState(0);
+  const [pickP, setPickP] = useState(0);
 
   const say = useCallback((m: string) => {
     setToast(m);
@@ -114,13 +119,17 @@ export default function NutriTrack({
   );
 
   const addFood = useCallback(
-    (f: Food, amount: number, at: string) => {
-      const m = macrosFor(f, amount);
+    (f: Food, amount: number, at: string, perUnit?: { k: number; p: number }) => {
+      const k = perUnit?.k ?? f.k;
+      const p = perUnit?.p ?? f.p;
+      const total = f.g
+        ? { k: (k * amount) / 100, p: (p * amount) / 100 }
+        : { k: k * amount, p: p * amount };
       return addEntry({
         eaten_on: key, eaten_at: at || nowHM(),
         name: f.n, emoji: f.e, qty: amount, unit: f.u, per_g: f.g,
-        unit_kcal: f.k, unit_protein: f.p,
-        kcal: Math.round(m.k), protein: Math.round(m.p * 10) / 10,
+        unit_kcal: k, unit_protein: p,
+        kcal: Math.round(total.k), protein: Math.round(total.p * 10) / 10,
         plan_id: null,
       });
     },
@@ -145,12 +154,17 @@ export default function NutriTrack({
 
   /* Edits are held as a draft until you press Save, so changing a time doesn't
      make the card jump between meals halfway through typing it. */
-  const draftOf = (e: Entry) => drafts[e.id] ?? { time: hm(e.eaten_at), qty: Number(e.qty ?? 0) };
+  const draftOf = (e: Entry) => drafts[e.id] ?? {
+    time: hm(e.eaten_at), qty: Number(e.qty ?? 0),
+    k: Number(e.unit_kcal ?? 0), p: Number(e.unit_protein ?? 0),
+  };
   const isDirty = (e: Entry) => {
     const d = drafts[e.id];
-    return !!d && (d.time !== hm(e.eaten_at) || d.qty !== Number(e.qty ?? 0));
+    if (!d) return false;
+    return d.time !== hm(e.eaten_at) || d.qty !== Number(e.qty ?? 0)
+      || d.k !== Number(e.unit_kcal ?? 0) || d.p !== Number(e.unit_protein ?? 0);
   };
-  const setDraft = (e: Entry, patch: Partial<{ time: string; qty: number }>) =>
+  const setDraft = (e: Entry, patch: Partial<{ time: string; qty: number; k: number; p: number }>) =>
     setDrafts((prev) => ({ ...prev, [e.id]: { ...draftOf(e), ...patch } }));
 
   const saveDraft = useCallback(
@@ -158,10 +172,12 @@ export default function NutriTrack({
       const d = drafts[e.id];
       if (!d) return;
       const patch: Partial<Entry> = { eaten_at: d.time };
-      if (e.qty != null && e.unit_kcal != null && e.unit_protein != null) {
-        const k = e.per_g ? (Number(e.unit_kcal) * d.qty) / 100 : Number(e.unit_kcal) * d.qty;
-        const p = e.per_g ? (Number(e.unit_protein) * d.qty) / 100 : Number(e.unit_protein) * d.qty;
+      if (e.qty != null) {
+        const k = e.per_g ? (d.k * d.qty) / 100 : d.k * d.qty;
+        const p = e.per_g ? (d.p * d.qty) / 100 : d.p * d.qty;
         patch.qty = d.qty;
+        patch.unit_kcal = d.k;
+        patch.unit_protein = d.p;
         patch.kcal = Math.round(k);
         patch.protein = Math.round(p * 10) / 10;
       }
@@ -214,6 +230,7 @@ export default function NutriTrack({
         a: "",
       };
       setPick(f); setQty(defaultQty(f)); setWhen(nowHM());
+      setPickK(f.k); setPickP(f.p);
       say("Estimated — adjust the amount, then save");
     } catch (err) {
       say(err instanceof Error ? err.message : "Could not estimate");
@@ -301,6 +318,24 @@ export default function NutriTrack({
             {changed ? "Save" : "Saved"}
           </button>
         </div>
+
+        {e.qty != null && (
+          <details className="manual" style={{ width: "100%", marginTop: 8 }}>
+            <summary>Change the calories or protein</summary>
+            <div className="pair" style={{ marginTop: 8 }}>
+              <div style={{ flex: 1 }}>
+                <label>Calories {e.per_g ? "per 100g" : `per ${e.unit ?? "serving"}`}</label>
+                <input className="mono" type="number" inputMode="decimal" min="0" value={d.k}
+                       onChange={(ev) => setDraft(e, { k: Math.max(0, +ev.target.value) })} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label>Protein (g)</label>
+                <input className="mono" type="number" inputMode="decimal" min="0" step="0.1" value={d.p}
+                       onChange={(ev) => setDraft(e, { p: Math.max(0, +ev.target.value) })} />
+              </div>
+            </div>
+          </details>
+        )}
       </div>
     );
   }
@@ -474,7 +509,10 @@ export default function NutriTrack({
                   <div className="reslist">
                     {matches.map((f) => (
                       <button key={f.n} className="fres"
-                              onClick={() => { setPick(f); setQty(defaultQty(f)); setWhen(nowHM()); }}>
+                              onClick={() => {
+                                setPick(f); setQty(defaultQty(f)); setWhen(nowHM());
+                                setPickK(f.k); setPickP(f.p);
+                              }}>
                         <span className="fe">{f.e}</span>
                         <span className="fn">{f.n}</span>
                         <span className="fu">{perUnit(f)}</span>
@@ -549,9 +587,30 @@ export default function NutriTrack({
                               onClick={() => setQty((v) => Math.round((v + stepOf(pick)) * 100) / 100)}>+</button>
                     </div>
                     <div className="qtot">
-                      {Math.round(macrosFor(pick, qty).k)} kcal ·{" "}
-                      {Math.round(macrosFor(pick, qty).p * 10) / 10}g protein
+                      {Math.round(pick.g ? (pickK * qty) / 100 : pickK * qty)} kcal ·{" "}
+                      {Math.round((pick.g ? (pickP * qty) / 100 : pickP * qty) * 10) / 10}g protein
                     </div>
+
+                    <details className="manual">
+                      <summary>
+                        Not the same as yours? Change the numbers
+                      </summary>
+                      <div className="pair" style={{ marginTop: 8 }}>
+                        <div style={{ flex: 1 }}>
+                          <label htmlFor="pk">Calories {pick.g ? "per 100g" : `per ${pick.u}`}</label>
+                          <input id="pk" className="mono" type="number" inputMode="decimal" min="0"
+                                 value={pickK} onChange={(e) => setPickK(Math.max(0, +e.target.value))} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label htmlFor="pp">Protein (g) {pick.g ? "per 100g" : `per ${pick.u}`}</label>
+                          <input id="pp" className="mono" type="number" inputMode="decimal" min="0" step="0.1"
+                                 value={pickP} onChange={(e) => setPickP(Math.max(0, +e.target.value))} />
+                        </div>
+                      </div>
+                      <p className="grpsub" style={{ margin: "8px 0 0" }}>
+                        Read them off the packet. This changes today&rsquo;s entry only.
+                      </p>
+                    </details>
                     <div className="qtime">
                       <label htmlFor="qwhen">What time?</label>
                       <input id="qwhen" type="time" value={when} onChange={(e) => setWhen(e.target.value)} />
@@ -560,8 +619,9 @@ export default function NutriTrack({
                       className="save"
                       onClick={() => {
                         const f = pick, amount = qty, at = when || nowHM();
+                        const nums = { k: pickK, p: pickP };
                         setPick(null); setQ(""); setWhen("");
-                        addFood(f, amount, at);
+                        addFood(f, amount, at, nums);
                         say(`${f.n} saved at ${h12(at)}`);
                       }}
                     >Save to my day</button>
