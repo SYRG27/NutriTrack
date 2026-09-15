@@ -838,7 +838,56 @@ export const FOODS: Food[] = [
  F("Mango lassi","🥭","glass",300,8,0,"restaurant drink"),
  F("Falooda","🍨","glass",420,8,0,"restaurant dessert"),
  F("Jaljeera","🥤","glass",40,0,0,"restaurant drink"),
- F("Gulab jamun with ice cream","🍮","serving",420,5,0,"restaurant dessert")
+ F("Gulab jamun with ice cream","🍮","serving",420,5,0,"restaurant dessert"),
+
+ /* --- Indian restaurant and tiffin-centre breakfast (bigger than the home version) --- */
+ F("Masala dosa, restaurant","🫓","dosa",450,9,0,"tiffin breakfast"),
+ F("Paper roast dosa","🫓","dosa",320,6,0,"tiffin restaurant breakfast"),
+ F("Ghee roast dosa","🫓","dosa",520,7,0,"tiffin restaurant breakfast"),
+ F("Mysore masala dosa","🫓","dosa",500,10,0,"tiffin restaurant breakfast"),
+ F("Butter dosa","🫓","dosa",480,6,0,"tiffin restaurant"),
+ F("Egg dosa","🍳","dosa",380,14,0,"tiffin restaurant breakfast"),
+ F("Onion rava dosa","🫓","dosa",420,7,0,"tiffin restaurant"),
+ F("Ragi dosa","🫓","dosa",200,5,0,"tiffin millet breakfast"),
+ F("Oats dosa","🫓","dosa",180,5,0,"tiffin breakfast"),
+ F("Onion uttapam","🫓","uttapam",350,8,0,"tiffin restaurant breakfast"),
+ F("Tomato uttapam","🫓","uttapam",340,7,0,"tiffin restaurant breakfast"),
+ F("Set dosa with sagu","🫓","plate",480,10,0,"tiffin restaurant breakfast"),
+ F("Idli vada combo","🍚","plate",480,12,0,"tiffin restaurant breakfast sambar"),
+ F("Mini idli sambar","🍚","plate",420,10,0,"tiffin restaurant sambar idli"),
+ F("Podi idli","🍚","plate",420,10,0,"tiffin restaurant ghee"),
+ F("Masala idli","🍚","plate",380,9,0,"tiffin restaurant"),
+ F("Ghee pongal","🥣","plate",450,10,0,"tiffin restaurant breakfast"),
+ F("Millet pongal","🥣","plate",400,10,0,"tiffin breakfast"),
+ F("Chow chow bath","🥣","plate",620,9,0,"tiffin kesari khara bath breakfast"),
+ F("Poori masala","🫓","plate",560,10,0,"tiffin restaurant breakfast aloo"),
+ F("Aloo puri","🫓","plate",600,11,0,"restaurant breakfast"),
+ F("Mysore bonda, 3","🍩","serving",300,5,0,"tiffin restaurant breakfast"),
+ F("MLA pesarattu","🫓","plate",520,14,0,"pesarattu upma tiffin restaurant"),
+ F("Uggani","🥣","plate",280,6,0,"borugula upma tiffin breakfast"),
+
+ /* --- Kerala and coastal breakfast --- */
+ F("Appam with veg stew","🫓","plate",520,10,0,"kerala restaurant breakfast"),
+ F("Puttu with kadala curry","🍚","plate",520,16,0,"kerala restaurant breakfast"),
+ F("Idiyappam with egg curry","🍜","plate",500,16,0,"kerala restaurant breakfast"),
+ F("Kerala parotta with egg curry","🫓","plate",700,20,0,"restaurant breakfast"),
+ F("Kerala parotta with beef","🫓","plate",850,35,0,"restaurant breakfast"),
+
+ /* --- North and West Indian breakfast --- */
+ F("Chole kulcha","🫓","plate",650,16,0,"restaurant breakfast punjabi"),
+ F("Paratha platter with curd","🫓","plate",780,18,0,"restaurant breakfast punjabi"),
+ F("Misal pav","🍲","plate",550,16,0,"restaurant breakfast maharashtrian"),
+ F("Sabudana khichdi","🥣","plate",450,6,0,"restaurant breakfast upvas"),
+ F("Dhokla, 4 pieces","🟡","serving",250,8,0,"restaurant breakfast gujarati khaman"),
+ F("Thepla, 2","🫓","serving",240,6,0,"restaurant breakfast gujarati"),
+ F("Sheera","🍮","serving",320,4,0,"restaurant breakfast halwa suji"),
+
+ /* --- egg and café breakfast --- */
+ F("Masala omelette","🍳","omelette",320,20,0,"restaurant breakfast 3 eggs"),
+ F("Bread omelette","🥪","plate",400,22,0,"restaurant breakfast"),
+ F("Egg bhurji with pav","🍳","plate",480,22,0,"restaurant breakfast"),
+ F("Bun butter jam","🍞","serving",320,6,0,"restaurant breakfast cafe"),
+ F("Indian breakfast buffet plate","🍽️","plate",900,25,0,"restaurant hotel")
 
 
 
