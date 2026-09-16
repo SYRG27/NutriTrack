@@ -15,6 +15,7 @@ import {
 import Dial from "./Dial";
 import WeekPlan from "./WeekPlan";
 import Trends from "./Trends";
+import Water from "./Water";
 
 type Tab = "today" | "week" | "trends";
 
@@ -67,6 +68,7 @@ export default function NutriTrack({
   const [remember, setRemember] = useState(false);
   // Foods you saved your own numbers for, keyed by name.
   const [myFoods, setMyFoods] = useState<Record<string, Food>>({});
+  const [water, setWater] = useState<Record<string, number>>({});
 
   const say = useCallback((m: string) => {
     setToast(m);
@@ -78,15 +80,22 @@ export default function NutriTrack({
     let alive = true;
     (async () => {
       const since = shiftKey(TODAY(), -HISTORY_DAYS);
-      const [e, w, f] = await Promise.all([
+      const [e, w, f, h2o] = await Promise.all([
         supabase.from("entries").select("*").gte("eaten_on", since).order("eaten_at"),
         supabase.from("weigh_ins").select("measured_on, lb").order("measured_on"),
         supabase.from("user_foods").select("*"),
+        supabase.from("water_log").select("logged_on, ml").gte("logged_on", since),
       ]);
       if (!alive) return;
       if (e.data) setEntries(e.data as Entry[]);
       if (w.data) setWeighIns(w.data as WeighIn[]);
       if (f.data) setMyFoods(Object.fromEntries((f.data as MyFoodRow[]).map(toMyFood)));
+      if (h2o.data)
+        setWater(
+          Object.fromEntries(
+            (h2o.data as { logged_on: string; ml: number }[]).map((r) => [r.logged_on, r.ml]),
+          ),
+        );
       setLoading(false);
     })();
     return () => { alive = false; };
@@ -209,6 +218,25 @@ export default function NutriTrack({
     [drafts, patchEntry, say],
   );
 
+
+  const setWaterFor = useCallback(
+    async (dayKeyStr: string, ml: number) => {
+      const before = water[dayKeyStr] ?? 0;
+      setWater((w) => ({ ...w, [dayKeyStr]: ml }));
+      const { data: u } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from("water_log")
+        .upsert(
+          { user_id: u.user?.id, logged_on: dayKeyStr, ml, updated_at: new Date().toISOString() },
+          { onConflict: "user_id,logged_on" },
+        );
+      if (error) {
+        setWater((w) => ({ ...w, [dayKeyStr]: before }));
+        say("Could not save that");
+      }
+    },
+    [water, supabase, say],
+  );
 
   const saveWeight = useCallback(
     async (lb: number) => {
@@ -557,8 +585,7 @@ export default function NutriTrack({
             </div>
 
             <div className="todaygrid">
-            <div className="colmain">{blocks.map((b) => b.node)}</div>
-            <div className="colside">
+            <div className="colmain">
 
             <div className="section">
               <div className="sechead">Ate something else?</div>
