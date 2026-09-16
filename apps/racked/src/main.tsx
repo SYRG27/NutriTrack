@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./components/Home";
 import GroupPage from "./components/GroupPage";
+import DayPage from "./components/DayPage";
 import Header from "./components/Header";
 import "./index.css";
 
@@ -36,6 +37,7 @@ createRoot(document.getElementById("root")!).render(
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/g/:groupKey" element={<GroupPage />} />
+        <Route path="/day/:split" element={<DayPage />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </HashRouter>

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import InstallApp from "@/components/InstallApp";
 
 const TAGLINE =
   "Answer a few questions, get a week of meals built around your numbers, and log what you actually eat.";
@@ -9,7 +10,12 @@ export const metadata: Metadata = {
   title: { default: "NutriTrack", template: "%s · NutriTrack" },
   description: TAGLINE,
   applicationName: "NutriTrack",
-  appleWebApp: { capable: true, title: "NutriTrack", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "NutriTrack", statusBarStyle: "black-translucent" },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     type: "website",
     siteName: "NutriTrack",
@@ -40,7 +46,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <InstallApp />
+      </body>
     </html>
   );
 }

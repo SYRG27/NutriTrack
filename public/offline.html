@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NutriTrack — offline</title>
+    <style>
+      body { margin:0; min-height:100dvh; display:grid; place-items:center; background:#0D1512;
+             color:#E9F0EB; font-family:system-ui,-apple-system,sans-serif; padding:24px; }
+      .box { max-width:340px; text-align:center; }
+      h1 { font-size:22px; margin:18px 0 8px; }
+      p { color:#84978C; font-size:14px; line-height:1.6; margin:0 0 20px; }
+      button { background:#3FBF90; color:#0D1512; border:0; border-radius:10px;
+               padding:11px 20px; font-weight:600; font-size:14.5px; cursor:pointer; }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <svg width="54" height="54" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" fill="none" stroke="#24382F" stroke-width="3"/>
+        <path d="M16 3a13 13 0 1 1-9.2 22.2" fill="none" stroke="#3FBF90" stroke-width="3" stroke-linecap="round"/>
+        <path d="M10.4 21.6c-.6-5.2 3.4-9.9 10.8-10.4.6 6.2-3.6 10.7-10.8 10.4z" fill="#3FBF90"/>
+      </svg>
+      <h1>No connection</h1>
+      <p>
+        NutriTrack needs the network to load your log. The exercise library works offline once
+        you have opened it &mdash; try that, or reconnect and reload.
+      </p>
+      <button onclick="location.reload()">Try again</button>
+    </div>
+  </body>
+</html>

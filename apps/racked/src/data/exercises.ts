@@ -2378,6 +2378,47 @@ export const DATA: MuscleGroup[] = [
   ]),
 ];
 
+/* ---------------------------------------------------------------------------
+   The link from the food log. NutriTrack knows what you train today; this
+   turns that into the exercises for it.
+--------------------------------------------------------------------------- */
+
+export const SPLIT_GROUPS: Record<string, string[]> = {
+  chest_back: ["chest", "back"],
+  arms: ["biceps", "triceps"],
+  legs: ["legs", "abs"],
+  shoulders: ["shoulders", "back"],
+  push: ["chest", "shoulders", "triceps"],
+  pull: ["back", "biceps"],
+  full_body: ["legs", "chest", "back"],
+  cardio: ["cardio", "abs"],
+  core: ["abs", "bodyweight"],
+  rest: ["cardio", "bodyweight"],
+};
+
+export const SPLIT_LABEL: Record<string, string> = {
+  chest_back: "Chest + Back",
+  arms: "Biceps + Triceps",
+  legs: "Legs + Abs",
+  shoulders: "Shoulders + Back",
+  push: "Push",
+  pull: "Pull",
+  full_body: "Full body",
+  cardio: "Cardio only",
+  core: "Core + mobility",
+  rest: "Rest day",
+};
+
+/** A session for the day: the starters from each muscle the split covers. */
+export function sessionFor(split: string) {
+  const keys = SPLIT_GROUPS[split] ?? [];
+  const perGroup = keys.length <= 2 ? 3 : 2;
+  return keys
+    .map((k) => DATA.find((g) => g.key === k))
+    .filter((g): g is MuscleGroup => !!g)
+    .map((g) => ({ group: g, picks: g.exercises.filter((e) => e.starter).slice(0, perGroup) }));
+}
+
 export const GROUPS = DATA;
 export const groupByKey = (key: string) => DATA.find((g) => g.key === key);
 export const findExercise = (group: MuscleGroup, slug: string) =>

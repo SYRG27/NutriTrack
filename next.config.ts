@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
     const noStore = [{ key: "Cache-Control", value: "no-cache, must-revalidate" }];
     return [
       { source: "/train", headers: noStore },
+      // A stale service worker outlives every other kind of stale file.
+      { source: "/sw.js", headers: noStore },
       { source: "/train/index.html", headers: noStore },
       {
         source: "/train/assets/:file*",

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import type { Entry, WeighIn } from "@/lib/types";
 import { targetsFor, showWeight, type Profile } from "@/lib/profile";
-import { amountOf, dayKey, parseKey, h12, totalsFor } from "@/lib/day";
+import { amountOf, dayKey, parseKey, totalsFor } from "@/lib/day";
+import { weeklyReview } from "@/lib/review";
 
 const DL = "SMTWTFS";
 
@@ -12,8 +13,10 @@ export default function Trends({
   weighIns,
   onSaveWeight,
   profile,
+  allEntries,
 }: {
   entriesByDay: Map<string, Entry[]>;
+  allEntries: Entry[];
   weighIns: WeighIn[];
   onSaveWeight: (lb: number) => Promise<void>;
   profile: Profile;
@@ -24,6 +27,7 @@ export default function Trends({
     startLb: profile.weight_lb, goalLb: profile.goal_weight_lb,
   };
   const unit = profile.units;
+  const review = weeklyReview(allEntries, weighIns, profile, t);
   const today = dayKey(new Date());
   const existing = weighIns.find((w) => w.measured_on === today);
   const [lb, setLb] = useState(existing ? String(existing.lb) : "");
@@ -85,6 +89,30 @@ export default function Trends({
 
   return (
     <div className="section trendswrap">
+      <div className={`review ${review.tone}`}>
+        <div className="revtop">
+          <span className="revlab">This week</span>
+          <span className="revdays mono">{review.days}/7 days logged</span>
+        </div>
+        <div className="revhead">{review.headline}</div>
+        <p className="revbody">{review.advice}</p>
+        {review.days > 0 && (
+          <div className="revstats">
+            <span><b className="mono">{review.kcal.toLocaleString()}</b> kcal a day</span>
+            <span><b className="mono">{review.protein}g</b> protein a day</span>
+            {review.weightChange != null && (
+              <span>
+                <b className="mono">
+                  {review.weightChange > 0 ? "+" : ""}
+                  {review.weightChange}
+                </b>{" "}
+                {unit} in a fortnight
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="sechead">Last 14 days</div>
       <div className="secsub">Bars are calories eaten; the dashed line is your {TARGET.kcal.toLocaleString()} target.</div>
 

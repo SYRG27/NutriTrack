@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { buildPlan, itemKcal, itemLabel, itemProtein, slotTotals } from "@/lib/plan";
-import { targetsFor, showWeight, type Profile } from "@/lib/profile";
+import { splitFor, targetsFor, showWeight, type Profile } from "@/lib/profile";
 import Logo from "./Logo";
 import {
   FAVES, FOODS, defaultQty, findFoods, foodByName, macrosFor, perUnit, plural, stepOf,
@@ -537,7 +537,7 @@ export default function NutriTrack({
         ) : tab === "week" ? (
           <WeekPlan plan={PLAN} profile={profile} />
         ) : tab === "trends" ? (
-          <Trends entriesByDay={entriesByDay} weighIns={weighIns}
+          <Trends entriesByDay={entriesByDay} weighIns={weighIns} allEntries={entries}
                   onSaveWeight={saveWeight} profile={profile} />
         ) : (
           <>
@@ -546,7 +546,8 @@ export default function NutriTrack({
                 <span className="slotname">{plan.label}</span>
                 <span className="daytag">{plan.focus}</span>
                 {plan.gym && (
-                  <a className="gymlink" href="/train">
+                  /* Straight to today's exercises, not the library's front door. */
+                  <a className="gymlink" href={`/train#/day/${splitFor(profile, parseKey(key).getDay())}`}>
                     How to do it →
                   </a>
                 )}

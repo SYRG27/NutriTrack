@@ -1,0 +1,21 @@
+{
+  "name": "NutriTrack",
+  "short_name": "NutriTrack",
+  "description": "Answer a few questions, get a week of meals built around your numbers, and log what you actually eat.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D1512",
+  "theme_color": "#0D1512",
+  "categories": ["health", "fitness", "food"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Log a meal", "url": "/", "description": "Today's plan and your food log" },
+    { "name": "Exercise library", "url": "/train", "description": "How to do every exercise" }
+  ]
+}
