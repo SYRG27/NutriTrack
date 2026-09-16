@@ -9,6 +9,8 @@
     @apply bg-bg text-ink font-body antialiased;
     margin: 0;
     overflow-x: hidden;
+    /* Installed on iOS the page runs under the status bar and the home bar. */
+    padding-bottom: env(safe-area-inset-bottom);
   }
   h1, h2, h3 {
     @apply font-display uppercase;

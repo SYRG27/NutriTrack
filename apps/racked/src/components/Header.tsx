@@ -25,8 +25,8 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-[rgba(13,14,15,0.93)] backdrop-blur">
-      <div className="mx-auto flex max-w-[1180px] items-center gap-3 px-5 py-[14px]">
+    <header className="sticky top-0 z-30 border-b border-border bg-[rgba(13,14,15,0.93)] pt-[env(safe-area-inset-top)] backdrop-blur">
+      <div className="mx-auto flex max-w-[1180px] items-center gap-2 px-4 py-[13px] sm:gap-3 sm:px-5 sm:py-[14px]">
         <a href="#/" onClick={goHome} className="flex items-center gap-3" aria-label="Racked home">
           <span
             className="grid h-[29px] w-[29px] place-items-center rounded-[7px] bg-accent font-display text-[17px] font-600 text-bg"
@@ -34,7 +34,7 @@ export default function Header() {
           >
             R
           </span>
-          <span className="leading-none">
+          <span className="hidden leading-none min-[380px]:block">
             <span className="block font-display text-[18px] font-600 uppercase tracking-[0.06em] text-ink">
               Racked
             </span>
