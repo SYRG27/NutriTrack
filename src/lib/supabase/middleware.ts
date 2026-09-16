@@ -31,7 +31,11 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isPublic = path.startsWith("/login") || path.startsWith("/auth");
+  /* /api/config hands the static exercise library its Supabase keys, so it has
+     to answer before there is a session to check. It returns only the public
+     values the main bundle already ships. */
+  const isPublic =
+    path.startsWith("/login") || path.startsWith("/auth") || path === "/api/config";
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
