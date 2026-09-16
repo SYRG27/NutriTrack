@@ -54,7 +54,7 @@ export default function SetLog({
     return (
       <div className="mt-5 rounded-box border border-border bg-surface-2 px-4 py-[13px]">
         <p className="text-[13px] leading-[1.55] text-muted">
-          <a href="/" className="text-accent underline underline-offset-4">Sign in to NutriTrack</a>{" "}
+          <a href="/login" className="text-accent underline underline-offset-4">Sign in</a>{" "}
           to record your sets here and see what you lifted last time.
         </p>
       </div>

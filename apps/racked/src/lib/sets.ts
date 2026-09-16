@@ -1,4 +1,5 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type WorkoutSet = {
   id: string;
@@ -20,9 +21,14 @@ export const today = () => {
 let clientPromise: Promise<SupabaseClient | null> | null = null;
 
 /**
- * Same origin as the food log, so the session cookie is already here. The keys
- * come from the app at runtime rather than being baked into this bundle, which
- * is committed to the repo.
+ * Same origin as the food log, so its session cookie is already here — but only
+ * if we read cookies. The main app signs in through @supabase/ssr, which stores
+ * the session in cookies so the server can see it; a plain browser client looks
+ * in localStorage instead and finds nothing, which is why this asked you to
+ * sign in while you were already signed in.
+ *
+ * The keys come from the app at runtime rather than being baked into this
+ * bundle, which is committed to the repo.
  */
 export function supabase(): Promise<SupabaseClient | null> {
   if (clientPromise) return clientPromise;
@@ -32,9 +38,7 @@ export function supabase(): Promise<SupabaseClient | null> {
       if (!res.ok) return null;
       const { supabaseUrl, supabaseAnonKey } = await res.json();
       if (!supabaseUrl || !supabaseAnonKey) return null;
-      return createClient(supabaseUrl, supabaseAnonKey, {
-        auth: { persistSession: true, autoRefreshToken: true, storageKey: "sb-nutritrack-auth" },
-      });
+      return createBrowserClient(supabaseUrl, supabaseAnonKey);
     } catch {
       return null;
     }
