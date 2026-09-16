@@ -2021,6 +2021,7 @@ export const DATA: MuscleGroup[] = [
         { name: "Rowing intervals", equipment: "Rower", note: "Similar full-body demand, more technique." },
         { name: "Bike sprints", equipment: "Spin bike", note: "Legs only, easier to pace." },
       ],
+      media: { poster: "media/exercises/assault-bike.svg" },
       swap: "Rowing Machine",
     },
     {
