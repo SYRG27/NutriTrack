@@ -1,12 +1,33 @@
-import { Link, useMatch } from "react-router-dom";
+import { useLocation, useMatch, useNavigate } from "react-router-dom";
 
 export default function Header() {
   const onGroup = useMatch("/g/:groupKey");
+  const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+
+  /* Leaving a page with the drawer open would otherwise leave that exercise in
+     the history, and Back would reopen it. Drop it first, then navigate. */
+  const drawerOpen = () => new URLSearchParams(search).has("ex");
+  const dropOpenDrawer = () => {
+    if (drawerOpen()) navigate(pathname, { replace: true });
+  };
+  /* With the drawer open, replace that entry with the destination instead of
+     rewriting it to the group first — otherwise the group lands in the history
+     twice and one Back press appears to do nothing. */
+  const goHome = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate("/", { replace: drawerOpen() });
+  };
+  const exitToTracker = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dropOpenDrawer();
+    window.location.href = "/";        // out of this app, into the food log
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-[rgba(13,14,15,0.93)] backdrop-blur">
       <div className="mx-auto flex max-w-[1180px] items-center gap-3 px-5 py-[14px]">
-        <Link to="/" className="flex items-center gap-3" aria-label="Racked home">
+        <a href="#/" onClick={goHome} className="flex items-center gap-3" aria-label="Racked home">
           <span
             className="grid h-[29px] w-[29px] place-items-center rounded-[7px] bg-accent font-display text-[17px] font-600 text-bg"
             aria-hidden="true"
@@ -21,20 +42,22 @@ export default function Header() {
               Exercise Library
             </span>
           </span>
-        </Link>
+        </a>
 
         <nav className="ml-auto flex items-center gap-2">
           {onGroup && (
-            <Link
-              to="/"
+            <a
+              href="#/"
+              onClick={goHome}
               className="rounded-full border border-border bg-surface-2 px-[15px] py-[8px] text-[12.5px] text-ink-2 transition-colors hover:border-accent hover:text-ink"
             >
               ← All muscle groups
-            </Link>
+            </a>
           )}
           {/* Out of the library and back to the food log. */}
           <a
             href="/"
+            onClick={exitToTracker}
             className="flex items-center gap-[7px] rounded-full border border-border bg-surface-2 px-[13px] py-[8px] text-[12.5px] text-ink-2 transition-colors hover:border-accent hover:text-ink"
           >
             <svg width="13" height="13" viewBox="0 0 32 32" aria-hidden="true">

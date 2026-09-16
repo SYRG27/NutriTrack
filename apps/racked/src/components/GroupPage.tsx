@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { findExercise, groupByKey } from "../data/exercises";
 import Media, { exerciseMedia } from "./Media";
 import Drawer from "./Drawer";
@@ -15,11 +15,15 @@ const EQUIP_FILTERS: { label: string; match: string[] }[] = [
 export default function GroupPage() {
   const { groupKey = "" } = useParams();
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const group = groupByKey(groupKey);
 
   const [query, setQuery] = useState("");
   const [equip, setEquip] = useState<string[]>([]);
   const opener = useRef<HTMLButtonElement | null>(null);
+  /* True when this page opened the drawer, as opposed to arriving on a shared
+     link with ?ex= already in the URL. Only then is there an entry to pop. */
+  const pushed = useRef(false);
 
   const openSlug = params.get("ex");
   const open = group && openSlug ? findExercise(group, openSlug) : undefined;
@@ -49,10 +53,20 @@ export default function GroupPage() {
 
   const openExercise = (slug: string, el: HTMLButtonElement | null) => {
     opener.current = el;
-    setParams({ ex: slug });                 // pushes, so Back closes the drawer
+    pushed.current = true;
+    setParams({ ex: slug });                 // one entry, so Back closes the drawer
   };
+
+  /* Closing pops the entry it pushed rather than adding another. Without this
+     every exercise you looked at stayed in the history and Back walked you
+     through all of them on the way out. */
   const close = () => {
-    setParams({}, { replace: true });        // replaces, so Back does not reopen it
+    if (pushed.current) {
+      pushed.current = false;
+      navigate(-1);
+    } else {
+      setParams({}, { replace: true });      // arrived on a shared link
+    }
     opener.current?.focus();
   };
 
