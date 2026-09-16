@@ -23,14 +23,28 @@ export default function Header() {
           </span>
         </Link>
 
-        {onGroup && (
-          <Link
-            to="/"
-            className="ml-auto rounded-full border border-border bg-surface-2 px-[15px] py-[8px] text-[12.5px] text-ink-2 transition-colors hover:border-accent hover:text-ink"
+        <nav className="ml-auto flex items-center gap-2">
+          {onGroup && (
+            <Link
+              to="/"
+              className="rounded-full border border-border bg-surface-2 px-[15px] py-[8px] text-[12.5px] text-ink-2 transition-colors hover:border-accent hover:text-ink"
+            >
+              ← All muscle groups
+            </Link>
+          )}
+          {/* Out of the library and back to the food log. */}
+          <a
+            href="/"
+            className="flex items-center gap-[7px] rounded-full border border-border bg-surface-2 px-[13px] py-[8px] text-[12.5px] text-ink-2 transition-colors hover:border-accent hover:text-ink"
           >
-            ← All muscle groups
-          </Link>
-        )}
+            <svg width="13" height="13" viewBox="0 0 32 32" aria-hidden="true">
+              <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" strokeWidth="3" opacity=".35" />
+              <path d="M16 3a13 13 0 1 1-9.2 22.2" fill="none" stroke="oklch(0.78 0.16 72)" strokeWidth="3" strokeLinecap="round" />
+              <path d="M10.4 21.6c-.6-5.2 3.4-9.9 10.8-10.4.6 6.2-3.6 10.7-10.8 10.4z" fill="oklch(0.78 0.16 72)" />
+            </svg>
+            <span className="hidden sm:inline">NutriTrack</span>
+          </a>
+        </nav>
       </div>
     </header>
   );

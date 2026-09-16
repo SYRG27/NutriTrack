@@ -88,9 +88,7 @@ export default function Drawer({
 
         <div className="px-5 pb-10 pt-5">
           {/* 2 — identity */}
-          <p className="eyebrow">
-            {group.name} · {exercise.level}
-          </p>
+          <p className="eyebrow">{group.name}</p>
           <h2 id="drawer-title" className="mt-[7px] text-[25px] font-600 leading-[1.1] tracking-[0.02em]">
             {exercise.name}
           </h2>
@@ -136,7 +134,33 @@ export default function Drawer({
             ))}
           </ul>
 
-          {/* 7 — setup */}
+          {/* 7 — other ways to do the same thing */}
+          {exercise.variations.length > 0 && (
+            <>
+              <h3 className="mt-8 text-[13px] font-600 tracking-[0.1em] text-ink">
+                Other ways to do it
+              </h3>
+              <p className="mt-[6px] max-w-copy text-[13px] leading-[1.55] text-muted">
+                Same movement, whatever is free. Pick one and stick with it for the session.
+              </p>
+              <ul className="mt-[13px] flex flex-col gap-[9px]">
+                {exercise.variations.map((v) => (
+                  <li
+                    key={v.name}
+                    className="rounded-box-sm border border-border bg-surface-2 px-[13px] py-[11px]"
+                  >
+                    <span className="block text-[13.5px] font-600 text-ink">{v.name}</span>
+                    <span className="microlabel mt-[5px] block">{v.equipment}</span>
+                    <span className="mt-[6px] block max-w-copy text-[13px] leading-[1.55] text-ink-2">
+                      {v.note}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {/* 8 — setup */}
           <h3 className="mt-8 text-[13px] font-600 tracking-[0.1em] text-ink">
             The machine / setup — {exercise.equipment}
           </h3>
@@ -144,7 +168,7 @@ export default function Drawer({
             <p className="max-w-copy text-[13.5px] leading-[1.65] text-ink-2">{exercise.setup}</p>
           </div>
 
-          {/* 8 — swap */}
+          {/* 9 — swap */}
           <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-border pt-5">
             <span className="microlabel">Swap it for:</span>
             <span className="pill">{exercise.swap}</span>

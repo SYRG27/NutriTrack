@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { findExercise, groupByKey, type Level } from "../data/exercises";
+import { findExercise, groupByKey } from "../data/exercises";
 import Media, { exerciseMedia } from "./Media";
 import Drawer from "./Drawer";
-
-const LEVELS: (Level | "All levels")[] = ["All levels", "Beginner", "Intermediate", "Advanced"];
 
 /** Equipment chips match on keywords in the free-text `equipment` field. */
 const EQUIP_FILTERS: { label: string; match: string[] }[] = [
@@ -20,7 +18,6 @@ export default function GroupPage() {
   const group = groupByKey(groupKey);
 
   const [query, setQuery] = useState("");
-  const [level, setLevel] = useState<(typeof LEVELS)[number]>("All levels");
   const [equip, setEquip] = useState<string[]>([]);
   const opener = useRef<HTMLButtonElement | null>(null);
 
@@ -33,7 +30,6 @@ export default function GroupPage() {
     if (!group) return [];
     const q = query.trim().toLowerCase();
     return group.exercises.filter((e) => {
-      if (level !== "All levels" && e.level !== level) return false;
       if (q && !(`${e.name} ${e.equipment}`.toLowerCase().includes(q))) return false;
       if (equip.length) {
         const hay = e.equipment.toLowerCase();
@@ -44,7 +40,7 @@ export default function GroupPage() {
       }
       return true;
     });
-  }, [group, query, level, equip]);
+  }, [group, query, equip]);
 
   if (!group)
     return (
@@ -55,15 +51,15 @@ export default function GroupPage() {
 
   const openExercise = (slug: string, el: HTMLButtonElement | null) => {
     opener.current = el;
-    setParams({ ex: slug });
+    setParams({ ex: slug });                 // pushes, so Back closes the drawer
   };
   const close = () => {
-    setParams({});
+    setParams({}, { replace: true });        // replaces, so Back does not reopen it
     opener.current?.focus();
   };
 
   const starters = group.exercises.filter((e) => e.starter).slice(0, 4);
-  const filtered = query.trim() !== "" || level !== "All levels" || equip.length > 0;
+  const filtered = query.trim() !== "" || equip.length > 0;
 
   const chip = (active: boolean) =>
     `rounded-full border px-[14px] py-[7px] text-[12.5px] transition-colors ${
@@ -134,14 +130,6 @@ export default function GroupPage() {
           />
         </label>
 
-        <div className="flex flex-wrap gap-[6px]" role="group" aria-label="Filter by level">
-          {LEVELS.map((l) => (
-            <button key={l} onClick={() => setLevel(l)} className={chip(level === l)}>
-              {l}
-            </button>
-          ))}
-        </div>
-
         <div className="flex flex-wrap gap-[6px]" role="group" aria-label="Filter by equipment">
           {EQUIP_FILTERS.map((f) => {
             const on = equip.includes(f.label);
@@ -174,7 +162,6 @@ export default function GroupPage() {
           <button
             onClick={() => {
               setQuery("");
-              setLevel("All levels");
               setEquip([]);
             }}
             className="mt-3 text-[13px] font-600 text-accent underline underline-offset-4"
@@ -197,9 +184,6 @@ export default function GroupPage() {
                   caption={`${e.name} demo`}
                   className="h-[222px] w-full"
                 />
-                <span className="absolute left-3 top-3 rounded-full bg-[rgba(10,11,12,0.78)] px-[11px] py-[5px] text-[11px] font-600 text-ink-2 backdrop-blur">
-                  {e.level}
-                </span>
               </div>
 
               <div className="flex flex-1 flex-col px-[15px] pb-[15px] pt-[14px]">
@@ -242,7 +226,6 @@ export default function GroupPage() {
         <button
           onClick={() => {
             setQuery("");
-            setLevel("All levels");
             setEquip([]);
           }}
           className="mt-6 text-[13px] text-muted underline underline-offset-4 hover:text-accent"
