@@ -46,7 +46,9 @@ export default function Media({
 /** Convention first, then an explicit override from the data file.
  *  BASE_URL keeps this correct whether it is served at / or at /train/. */
 const base = import.meta.env.BASE_URL;
+const resolve = (p: string) => (/^(https?:)?\//.test(p) ? p : base + p);
+
 export const exerciseMedia = (slug: string, override?: string) =>
-  override ?? `${base}media/exercises/${slug}.jpg`;
+  override ? resolve(override) : `${base}media/exercises/${slug}.jpg`;
 export const groupMedia = (key: string, override?: string) =>
-  override ?? `${base}media/groups/${key}.jpg`;
+  override ? resolve(override) : `${base}media/groups/${key}.jpg`;

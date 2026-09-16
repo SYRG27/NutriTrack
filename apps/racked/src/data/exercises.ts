@@ -2222,6 +2222,7 @@ export const DATA: MuscleGroup[] = [
         { name: "Single-leg wall sit", equipment: "A wall", note: "Lift one foot. Far harder." },
         { name: "Weighted wall sit", equipment: "Plate on your thighs", note: "Add load once 60 seconds is easy." },
       ],
+      media: { poster: "media/exercises/wall-sit.svg" },
       swap: "Bodyweight Squat",
     },
     {

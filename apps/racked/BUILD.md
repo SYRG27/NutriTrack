@@ -21,5 +21,16 @@ routes and its Tailwind styles cannot touch NutriTrack's own CSS.
 released under the Unlicense (public domain). The mapping from our exercise names to
 theirs was hand-checked, not fuzzy-matched.
 
-Do not replace these with images from JEFIT, Google or any other app — those are
+Three exercises are not in that dataset and were filled separately:
+
+| Exercise | Source | Licence |
+|---|---|---|
+| Burpee | Wikimedia Commons, *Airborne Burpee* (Marine Corps photo by Sgt. Ryan Young) | Public domain |
+| Jumping Jack | Wikimedia Commons, USMC photo by Lance Cpl. Ryan M. Joyner | Public domain |
+| Wall Sit | `wall-sit.svg`, drawn for this app | Ours |
+
+No free photo of a wall sit exists on Commons, so it is a diagram instead — which is
+arguably clearer for an isometric hold anyway.
+
+Do not replace any of these with images from JEFIT, Google or any other app — those are
 copyrighted. Own recordings, Wikimedia Commons or licensed stock only.
