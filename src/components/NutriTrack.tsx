@@ -585,7 +585,15 @@ export default function NutriTrack({
             </div>
 
             <div className="todaygrid">
-            <div className="colmain">
+            <div className="colmain">{blocks.map((b) => b.node)}</div>
+            <div className="colside">
+
+            <Water
+              profile={profile}
+              dayIndex={parseKey(key).getDay()}
+              ml={water[key] ?? 0}
+              onChange={(ml) => setWaterFor(key, ml)}
+            />
 
             <div className="section">
               <div className="sechead">Ate something else?</div>
