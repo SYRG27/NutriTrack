@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { findExercise, groupByKey } from "../data/exercises";
 import Media, { exerciseMedia } from "./Media";
@@ -20,8 +20,6 @@ export default function GroupPage() {
   const [query, setQuery] = useState("");
   const [equip, setEquip] = useState<string[]>([]);
   const opener = useRef<HTMLButtonElement | null>(null);
-
-  useEffect(() => window.scrollTo(0, 0), [groupKey]);
 
   const openSlug = params.get("ex");
   const open = group && openSlug ? findExercise(group, openSlug) : undefined;
