@@ -178,7 +178,7 @@ export default function GroupPage() {
             >
               <div className="relative">
                 <Media
-                  src={exerciseMedia(e.slug, e.media.loop ?? e.media.poster)}
+                  srcs={exerciseMedia(e.slug, e.media.loop ?? e.media.poster)}
                   caption={`${e.name} demo`}
                   className="h-[222px] w-full"
                 />

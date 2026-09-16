@@ -6,27 +6,33 @@ import { useEffect, useState } from "react";
  * footage exists. Never fill these by scraping another app's images.
  */
 export default function Media({
-  src,
+  srcs,
   caption,
   className = "",
 }: {
-  src?: string;
+  srcs: string[];
   caption: string;
   className?: string;
 }) {
-  const [failed, setFailed] = useState(!src);
+  // Try each source in turn; the placeholder is the last resort, not the first miss.
+  const [i, setI] = useState(0);
+  const key = srcs.join("|");
+  useEffect(() => setI(0), [key]);
 
-  useEffect(() => setFailed(!src), [src]);
+  const src = srcs[i];
+  const failed = !src;
 
-  if (failed || !src) {
+  if (failed) {
     return (
       <div
-        className={`grid place-items-center bg-placeholder p-3 ${className}`}
+        className={`grid place-items-center overflow-hidden bg-placeholder p-2 ${className}`}
         role="img"
         aria-label={`${caption} — no footage yet`}
       >
         <div className="grid h-full w-full place-items-center rounded-[9px] border border-dashed border-border px-3 text-center">
-          <span className="font-mono text-[11px] leading-[1.5] text-label">{caption}</span>
+          <span className="line-clamp-4 font-mono text-[10.5px] leading-[1.45] text-label">
+            {caption}
+          </span>
         </div>
       </div>
     );
@@ -37,7 +43,7 @@ export default function Media({
       src={src}
       alt={caption}
       loading="lazy"
-      onError={() => setFailed(true)}
+      onError={() => setI((n) => n + 1)}
       className={`h-full w-full object-cover ${className}`}
     />
   );
@@ -48,7 +54,22 @@ export default function Media({
 const base = import.meta.env.BASE_URL;
 const resolve = (p: string) => (/^(https?:)?\//.test(p) ? p : base + p);
 
+/**
+ * The source photos come in pairs: frame 0 is the setup, frame 1 is the
+ * position the exercise is actually in. Frame 1 is what people recognise —
+ * frame 0 of a plank is a man kneeling on the floor — so prefer it and fall
+ * back to frame 0 where there is only one.
+ */
 export const exerciseMedia = (slug: string, override?: string) =>
-  override ? resolve(override) : `${base}media/exercises/${slug}.jpg`;
+  override
+    ? [resolve(override)]
+    : [`${base}media/exercises/${slug}-2.jpg`, `${base}media/exercises/${slug}.jpg`];
+
 export const groupMedia = (key: string, override?: string) =>
-  override ? resolve(override) : `${base}media/groups/${key}.jpg`;
+  override ? [resolve(override)] : [`${base}media/groups/${key}.jpg`];
+
+/** A variation's own photo, or a drawn one where that is what exists. */
+export const variationMedia = (slug: string) => [
+  `${base}media/variations/${slug}.jpg`,
+  `${base}media/variations/${slug}.svg`,
+];

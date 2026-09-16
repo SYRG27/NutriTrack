@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { Exercise, MuscleGroup } from "../data/exercises";
-import Media, { exerciseMedia } from "./Media";
+import Media, { exerciseMedia, variationMedia } from "./Media";
 import RestTimer from "./RestTimer";
 
 export default function Drawer({
@@ -72,7 +72,7 @@ export default function Drawer({
             </video>
           ) : (
             <Media
-              src={exerciseMedia(exercise.slug, exercise.media.loop ?? exercise.media.poster)}
+              srcs={exerciseMedia(exercise.slug, exercise.media.loop ?? exercise.media.poster)}
               caption={`${exercise.name} demo`}
               className="h-[clamp(190px,30vh,280px)] w-full"
             />
@@ -143,16 +143,25 @@ export default function Drawer({
               <p className="mt-[6px] max-w-copy text-[13px] leading-[1.55] text-muted">
                 Same movement, whatever is free. Pick one and stick with it for the session.
               </p>
-              <ul className="mt-[13px] flex flex-col gap-[9px]">
+              <ul className="mt-[13px] flex flex-col gap-[10px]">
                 {exercise.variations.map((v) => (
                   <li
-                    key={v.name}
-                    className="rounded-box-sm border border-border bg-surface-2 px-[13px] py-[11px]"
+                    key={v.slug}
+                    className="flex gap-[13px] overflow-hidden rounded-box-sm border border-border bg-surface-2 p-[11px]"
                   >
-                    <span className="block text-[13.5px] font-600 text-ink">{v.name}</span>
-                    <span className="microlabel mt-[5px] block">{v.equipment}</span>
-                    <span className="mt-[6px] block max-w-copy text-[13px] leading-[1.55] text-ink-2">
-                      {v.note}
+                    <Media
+                      srcs={variationMedia(v.slug)}
+                      caption={v.name}
+                      className="h-[92px] w-[92px] shrink-0 rounded-[9px] object-cover"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[13.5px] font-600 leading-[1.25] text-ink">
+                        {v.name}
+                      </span>
+                      <span className="microlabel mt-[6px] block">{v.equipment}</span>
+                      <span className="mt-[7px] block max-w-copy text-[12.5px] leading-[1.5] text-ink-2">
+                        {v.note}
+                      </span>
                     </span>
                   </li>
                 ))}

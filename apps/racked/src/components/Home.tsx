@@ -24,7 +24,7 @@ export default function Home() {
             className="group flex flex-col overflow-hidden rounded-card border border-border bg-surface text-left transition-colors hover:border-accent"
           >
             <Media
-              src={groupMedia(g.key, g.hero)}
+              srcs={groupMedia(g.key, g.hero)}
               caption={`${g.name} reference image`}
               className="h-[168px] w-full"
             />

@@ -2,6 +2,7 @@ export type Region = "Push" | "Pull" | "Core" | "Lower body" | "Conditioning" | 
 
 /** Another way to do the same movement with whatever the gym has free. */
 export interface Variation {
+  slug: string;
   name: string;
   equipment: string;
   note: string;
@@ -48,9 +49,10 @@ const slugify = (name: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+type RawVariation = Omit<Variation, "slug">;
 type RawExercise = Omit<Exercise, "slug" | "media" | "variations"> & {
   media?: Media;
-  variations?: Variation[];
+  variations?: RawVariation[];
 };
 
 const group = (
@@ -70,7 +72,7 @@ const group = (
     ...e,
     slug: slugify(e.name),
     media: e.media ?? {},
-    variations: e.variations ?? [],
+    variations: (e.variations ?? []).map((v) => ({ ...v, slug: slugify(v.name) })),
   })),
 });
 
