@@ -993,29 +993,28 @@ export const DATA: MuscleGroup[] = [
       swap: "Preacher Curl Machine",
     },
     {
-      name: "Chin-Up",
-      equipment: "Pull-up bar, palms facing you",
-      dose: "3 × max reps", rest: "2 min", restSec: 120, tempo: "2-0-2", starter: false,
+      name: "Spider Curl",
+      equipment: "Incline bench + dumbbells or EZ bar",
+      dose: "3 × 10–12", rest: "60 sec", restSec: 60, tempo: "2-1-3", starter: false,
       summary:
-        "The heaviest thing your biceps will ever do, because it moves your whole bodyweight.",
+        "Chest down on an incline bench with your arms hanging straight. There is no way to swing, and the squeeze at the top is the hardest of any curl.",
       setup:
-        "Any pull-up bar. Palms facing towards you, hands about shoulder-width apart.",
+        "Set an adjustable bench to about 45 degrees and lie face down on it, chest on the pad, arms hanging off the top end.",
       cues: [
-        "Hang from the bar with your palms facing you and your arms straight.",
-        "Pull your chest towards the bar, driving your elbows down.",
-        "Get your chin clearly over the bar.",
-        "Lower all the way to straight arms before the next rep.",
+        "Lie chest-down on the incline with your arms hanging straight towards the floor.",
+        "Hold the weights with your palms facing forward, elbows pointing down.",
+        "Curl up towards your shoulders without letting your upper arms swing back.",
+        "Squeeze hard at the top, then lower all the way to straight.",
       ],
       mistakes: [
-        "Kipping and swinging. If you cannot do it still, use the assisted machine.",
-        "Stopping halfway down, which cuts out the part that builds the most.",
+        "Lifting your chest off the pad, which is the one thing the bench is there to prevent.",
+        "Letting the weights swing at the bottom instead of stopping them dead.",
       ],
       variations: [
-        { name: "Assisted chin-up", equipment: "Assisted pull-up machine", note: "Reduce the help as you get stronger." },
-        { name: "Band chin-up", equipment: "Bar + long band", note: "Loop it under a knee." },
-        { name: "Negative chin-up", equipment: "Bar + a box", note: "Jump up, lower for five seconds. Fastest route to your first rep." },
+        { name: "EZ bar spider curl", equipment: "Incline bench + EZ bar", note: "Both arms on one bar. Heavier, and kinder on the wrists." },
+        { name: "Cable spider curl", equipment: "Incline bench + low cable", note: "Tension stays on at the top where the dumbbells go light." },
       ],
-      swap: "Cable Curl",
+      swap: "Preacher Curl Machine",
     },
     {
       name: "Reverse Curl",
