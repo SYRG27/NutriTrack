@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" width="640" height="440" role="img"
+     aria-label="Bear crawl: on hands and toes with the knees an inch off the floor, moving opposite hand and foot together">
+  <rect width="640" height="440" fill="#191a1c"/>
+  <path d="M40 386 H600" stroke="#3a3d40" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- direction of travel -->
+  <path d="M470 120 H570" stroke="oklch(0.78 0.16 72)" stroke-width="4" stroke-linecap="round" stroke-dasharray="8 8"/>
+  <path d="M566 111 l16 9 -16 9 z" fill="oklch(0.78 0.16 72)"/>
+
+  <g fill="none" stroke="#f3f1ee" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M196 214 H392"/>                    <!-- flat back, hips level -->
+    <path d="M196 214 L172 300 L184 380"/>       <!-- leading arm to the floor -->
+    <path d="M392 214 L424 292 L398 380"/>       <!-- trailing leg, knee low -->
+    <path d="M392 214 L352 296 L372 380"/>       <!-- other leg, mid-step -->
+  </g>
+  <path d="M240 216 L268 300 L252 380" fill="none" stroke="#c8c5c1" stroke-width="13"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="170" cy="188" r="27" fill="#f3f1ee"/>
+
+  <!-- knee clearance, the whole point of the position -->
+  <path d="M356 300 H468" stroke="oklch(0.82 0.15 72)" stroke-width="2.5" stroke-dasharray="5 5"/>
+  <path d="M424 292 V318" stroke="oklch(0.82 0.15 72)" stroke-width="3"/>
+  <path d="M410 318 H438" stroke="oklch(0.82 0.15 72)" stroke-width="3"/>
+  <text x="446" y="312" font-family="IBM Plex Mono, monospace" font-size="15" fill="oklch(0.82 0.15 72)">knees 1&#8221; up</text>
+
+  <text x="60" y="80" font-family="IBM Plex Sans, sans-serif" font-size="19" font-weight="600" fill="#c8c5c1">Opposite hand</text>
+  <text x="60" y="106" font-family="IBM Plex Sans, sans-serif" font-size="19" font-weight="600" fill="#c8c5c1">and foot together</text>
+  <text x="60" y="424" font-family="IBM Plex Sans, sans-serif" font-size="17" fill="#9ea2a6">Hips stay level — no swinging</text>
+</svg>

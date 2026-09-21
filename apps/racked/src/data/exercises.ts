@@ -679,30 +679,6 @@ export const DATA: MuscleGroup[] = [
       swap: "Shoulder Press Machine",
     },
     {
-      name: "Cable Lateral Raise",
-      equipment: "Low cable + D-handle",
-      dose: "3 × 12–15 each side", rest: "60 sec", restSec: 60, tempo: "2-1-3", starter: false,
-      summary:
-        "Same movement as the dumbbell raise, but the cable keeps tension at the bottom where a dumbbell gives you a rest.",
-      setup:
-        "Set the pulley at the lowest point, clip on a single D-handle, and stand side-on with the cable running across your body.",
-      cues: [
-        "Take the handle in the hand furthest from the machine, across the front of your body.",
-        "Stand tall and hold the frame with your free hand for balance.",
-        "Raise your arm out to the side until your hand is level with your shoulder.",
-        "Lower slowly, resisting the cable all the way down.",
-      ],
-      mistakes: [
-        "Leaning away from the machine to get more range. Stay upright.",
-        "Letting the weight stack drop and yank your arm down.",
-      ],
-      variations: [
-        { name: "Dumbbell lateral raise", equipment: "Dumbbells", note: "Simpler and just as good if the cable station is busy." },
-        { name: "Machine lateral raise", equipment: "Lateral raise machine", note: "Fixed path, no swinging." },
-      ],
-      swap: "Dumbbell Lateral Raise",
-    },
-    {
       name: "Barbell Overhead Press",
       equipment: "Barbell + squat rack",
       dose: "4 × 6–8", rest: "2–3 min", restSec: 150, tempo: "2-1-1", starter: false,
@@ -2097,6 +2073,7 @@ export const DATA: MuscleGroup[] = [
         { name: "Post-meal walk", equipment: "Nothing", note: "Ten minutes after lunch and dinner. Easiest habit to keep." },
         { name: "Rucking", equipment: "Backpack with weight", note: "Add 8–10 kg and the same walk becomes real work." },
       ],
+      media: { poster: "media/exercises/brisk-outdoor-walk.svg" },
       swap: "Incline Treadmill Walk",
     },
   ]),
@@ -2398,6 +2375,7 @@ export const DATA: MuscleGroup[] = [
         { name: "Bear hold", equipment: "Nothing", note: "Hold the position still for 30 seconds. Start here." },
         { name: "Bear crawl shoulder tap", equipment: "Nothing", note: "Tap the opposite shoulder from the hold." },
       ],
+      media: { poster: "media/exercises/bear-crawl.svg" },
       swap: "Mountain Climber",
     },
   ]),
