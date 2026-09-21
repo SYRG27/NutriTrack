@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" width="640" height="440" role="img"
+     aria-label="Landmine press: one end of a barbell anchored at the floor, pressed up and away at an angle from the shoulder">
+  <rect width="640" height="440" fill="#191a1c"/>
+  <path d="M48 402 H596" stroke="#3a3d40" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- landmine anchor -->
+  <path d="M86 402 h58 l-10 -22 h-38 z" fill="#3a3d40"/>
+  <circle cx="115" cy="380" r="9" fill="#6b7073"/>
+
+  <!-- barbell, angled up and away from the anchor -->
+  <path d="M115 380 L392 148" stroke="#6b7073" stroke-width="13" stroke-linecap="round"/>
+  <!-- plates at the anchored end -->
+  <g stroke="#4a4e51" stroke-width="15" stroke-linecap="round">
+    <path d="M150 351 l14 -12"/><path d="M168 336 l14 -12"/>
+  </g>
+
+  <!-- the arc it travels -->
+  <path d="M300 268 A120 120 0 0 1 388 152" fill="none" stroke="oklch(0.78 0.16 72)"
+        stroke-width="4" stroke-dasharray="7 7" stroke-linecap="round"/>
+  <path d="M382 142 l12 12 -16 6 z" fill="oklch(0.78 0.16 72)"/>
+
+  <!-- lifter, side on, one arm pressing -->
+  <g fill="none" stroke="#f3f1ee" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M436 196 V300"/>                       <!-- torso, upright -->
+    <path d="M436 300 L404 400"/>                   <!-- front leg -->
+    <path d="M436 300 L486 398"/>                   <!-- back leg, staggered -->
+  </g>
+  <path d="M432 206 L390 152" fill="none" stroke="#c8c5c1" stroke-width="13" stroke-linecap="round"/>
+  <circle cx="440" cy="166" r="27" fill="#f3f1ee"/>
+
+  <text x="470" y="238" font-family="IBM Plex Sans, sans-serif" font-size="19" font-weight="600" fill="#c8c5c1">Press up</text>
+  <text x="470" y="264" font-family="IBM Plex Sans, sans-serif" font-size="19" font-weight="600" fill="#c8c5c1">and away</text>
+  <text x="470" y="352" font-family="IBM Plex Sans, sans-serif" font-size="17" fill="#9ea2a6">Ribs down, feet staggered</text>
+  <text x="60" y="76" font-family="IBM Plex Mono, monospace" font-size="15" fill="oklch(0.82 0.15 72)">one arm at a time</text>
+</svg>

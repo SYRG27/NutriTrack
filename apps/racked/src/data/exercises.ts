@@ -428,30 +428,6 @@ export const DATA: MuscleGroup[] = [
       swap: "Seated Cable Row",
     },
     {
-      name: "Face Pull",
-      equipment: "Cable tower + rope attachment",
-      dose: "3 × 15", rest: "60 sec", restSec: 60, tempo: "2-1-2", starter: false,
-      summary:
-        "The exercise that keeps your shoulders healthy through years of pressing. Light weight, high reps, every single week.",
-      setup:
-        "Rope attachment on a cable set to roughly face height. Use a light plate — this is not a strength movement.",
-      cues: [
-        "Hold the rope ends with your thumbs pointing backwards, arms straight out in front.",
-        "Step back until there is tension on the cable before you start.",
-        "Pull the rope towards your forehead, spreading your hands apart as it comes.",
-        "Squeeze the back of your shoulders for a second, then return slowly.",
-      ],
-      mistakes: [
-        "Loading it heavy and leaning back. If you are leaning, halve the weight.",
-        "Pulling to your chin instead of your forehead, which misses the rear shoulder.",
-      ],
-      variations: [
-        { name: "Band pull-apart", equipment: "Resistance band", note: "Do it anywhere, including as a warm-up before pressing." },
-        { name: "Rear delt cable fly", equipment: "Two cables crossed at face height", note: "Straighter arms, more rear delt, less trap." },
-      ],
-      swap: "Rear Delt Fly",
-    },
-    {
       name: "Assisted Pull-Up",
       equipment: "Assisted pull-up machine, or bar + band",
       dose: "3 × 6–10", rest: "2 min", restSec: 120, tempo: "2-0-2", starter: false,
@@ -572,6 +548,31 @@ export const DATA: MuscleGroup[] = [
         { name: "Trap bar shrug", equipment: "Trap bar", note: "Weight sits beside you rather than in front, which feels better for most people." },
       ],
       swap: "Face Pull",
+    },
+    {
+      name: "Inverted Row",
+      equipment: "Smith machine bar or a low bar",
+      dose: "3 × 8–12", rest: "90 sec", restSec: 90, tempo: "2-1-2", starter: true,
+      summary:
+        "A row using your own bodyweight. The horizontal counterpart to a pull-up, and far easier to start with — the more upright you stand, the easier it gets.",
+      setup:
+        "Set a Smith machine bar or a squat rack bar at about hip height. Higher is easier, lower is harder, so you can dial the difficulty exactly.",
+      cues: [
+        "Lie under the bar and grip it slightly wider than your shoulders, arms straight.",
+        "Walk your feet out until your body is a straight line from head to heels, hanging from the bar.",
+        "Pull your chest to the bar by driving your elbows down and back.",
+        "Lower under control until your arms are straight before the next rep.",
+      ],
+      mistakes: [
+        "Letting your hips sag so it becomes a half rep from the waist. Squeeze your glutes.",
+        "Shrugging your shoulders to your ears instead of squeezing the shoulder blades together.",
+      ],
+      variations: [
+        { name: "Feet on the floor, bar high", equipment: "Smith machine", note: "The easiest version. Raise the bar until you can do ten clean." },
+        { name: "Feet elevated", equipment: "Bar + a bench", note: "Feet on a bench makes it considerably harder without any weight." },
+        { name: "Ring row", equipment: "Gymnastic rings or a TRX", note: "Same movement with the grip free to rotate, which most shoulders prefer." },
+      ],
+      swap: "Seated Cable Row",
     },
   ]),
 
@@ -796,7 +797,32 @@ export const DATA: MuscleGroup[] = [
         { name: "Two-hand landmine press", equipment: "Barbell in a landmine", note: "Both hands on the end. Heavier, more chest involvement." },
         { name: "Half-kneeling landmine press", equipment: "Barbell in a landmine", note: "Kneeling stops you using your legs at all." },
       ],
+      media: { poster: "media/exercises/landmine-press.svg" },
       swap: "Shoulder Press Machine",
+    },
+    {
+      name: "Face Pull",
+      equipment: "Cable tower + rope attachment",
+      dose: "3 × 15", rest: "60 sec", restSec: 60, tempo: "2-1-2", starter: false,
+      summary:
+        "The exercise that keeps your shoulders healthy through years of pressing. Light weight, high reps, every single week.",
+      setup:
+        "Rope attachment on a cable set to roughly face height. Use a light plate — this is not a strength movement.",
+      cues: [
+        "Hold the rope ends with your thumbs pointing backwards, arms straight out in front.",
+        "Step back until there is tension on the cable before you start.",
+        "Pull the rope towards your forehead, spreading your hands apart as it comes.",
+        "Squeeze the back of your shoulders for a second, then return slowly.",
+      ],
+      mistakes: [
+        "Loading it heavy and leaning back. If you are leaning, halve the weight.",
+        "Pulling to your chin instead of your forehead, which misses the rear shoulder.",
+      ],
+      variations: [
+        { name: "Band pull-apart", equipment: "Resistance band", note: "Do it anywhere, including as a warm-up before pressing." },
+        { name: "Rear delt cable fly", equipment: "Two cables crossed at face height", note: "Straighter arms, more rear delt, less trap." },
+      ],
+      swap: "Rear Delt Fly",
     },
     {
       name: "Cable Rear Delt Fly",
